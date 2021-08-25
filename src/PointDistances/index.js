@@ -42,7 +42,7 @@ export const PointDistances = ({
           regions
             .filter((r2, i2) => i2 > i1)
             .filter((r2) => r2.type === "point")
-            .map((r2) => {
+            .map((r2, i2) => {
               const pr1 = projectRegionBox(r1)
               const pr2 = projectRegionBox(r2)
               const prm = {
@@ -66,7 +66,7 @@ export const PointDistances = ({
                   ).toFixed(pointDistancePrecision) + "%"
               }
               return (
-                <Fragment>
+                <Fragment key={i2}>
                   <path
                     d={`M${pr1.x + pr1.w / 2},${pr1.y + pr1.h / 2} L${
                       pr2.x + pr2.w / 2

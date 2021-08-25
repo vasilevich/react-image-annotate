@@ -47,6 +47,7 @@ const RegionComponents = {
   polygon: memo(({ region, iw, ih, fullSegmentationMode }) => {
     const Component = region.open ? "polyline" : "polygon"
     const alphaBase = fullSegmentationMode ? 0.5 : 1
+
     return (
       <Component
         points={region.points

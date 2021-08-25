@@ -1,6 +1,5 @@
 {
   "name": "react-image-annotate",
-  "main": "./dist/index.js",
   "version": "1.8.0",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.12",
@@ -12,6 +11,8 @@
     "autoseg": "^0.0.12",
     "clamp": "^1.0.1",
     "color-alpha": "^1.0.4",
+    "cp-cli": "^2.0.0",
+    "cross-env": "^7.0.3",
     "get-image-data": "^3.0.1",
     "material-survey": "^1.0.34",
     "mmgc1-cpp": "^1.0.50",
@@ -69,8 +70,6 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "cp-cli": "^2.0.0",
-    "cross-env": "^7.0.3",
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
     "@babel/plugin-proposal-optional-chaining": "^7.11.0",
