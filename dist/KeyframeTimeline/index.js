@@ -25,14 +25,12 @@ var Tick = styled("div")({
   width: 2,
   marginLeft: -1,
   height: "100%",
-  backgroundColor: colors.grey[300],
   bottom: 0
 });
 var TickText = styled("div")({
   position: "absolute",
   userSelect: "none",
   fontSize: 10,
-  color: colors.grey[600],
   fontWeight: "bold",
   bottom: 0
 });

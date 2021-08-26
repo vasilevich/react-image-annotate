@@ -1,6 +1,5 @@
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
 import React, { useState, memo, useCallback } from "react";
-import Paper from "@material-ui/core/Paper";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import ExpandIcon from "@material-ui/icons/ExpandMore";
 import IconButton from "@material-ui/core/IconButton";
@@ -26,7 +25,6 @@ var useStyles = makeStyles({
     paddingLeft: 16,
     paddingRight: 12,
     "& .iconContainer": {
-      color: grey[600],
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -41,9 +39,7 @@ var useStyles = makeStyles({
     flexGrow: 1,
     fontWeight: 800,
     paddingLeft: 8,
-    color: grey[800],
     "& span": {
-      color: grey[600],
       fontSize: 11
     }
   },
@@ -106,7 +102,6 @@ export var SidebarBox = function SidebarBox(_ref) {
     return changeExpanded(!expanded);
   });
   var customIconMapping = useIconDictionary();
-  var theme = useTheme();
   var TitleIcon = customIconMapping[title.toLowerCase()];
   return React.createElement("div", {
     className: classes.container
@@ -115,7 +110,6 @@ export var SidebarBox = function SidebarBox(_ref) {
     style: {
       position: 'sticky',
       top: 0,
-      background: theme.palette.background.paper,
       zIndex: 1
     }
   }, React.createElement("div", {

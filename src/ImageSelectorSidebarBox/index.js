@@ -21,7 +21,7 @@ export const ImageSelectorSidebarBox = ({ images, onSelect }) => {
     <SidebarBoxContainer
       title="Images"
       subTitle={`(${images.length})`}
-      icon={<CollectionsIcon style={{ color: grey[700] }} />}
+      icon={<CollectionsIcon/>}
     >
       <div>
         <List>

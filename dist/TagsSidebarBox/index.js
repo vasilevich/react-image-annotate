@@ -75,11 +75,7 @@ export var TagsSidebarBox = function TagsSidebarBox(_ref) {
     title: "Image Tags",
     expandedByDefault: true,
     noScroll: true,
-    icon: React.createElement(StyleIcon, {
-      style: {
-        color: grey[700]
-      }
-    })
+    icon: React.createElement(StyleIcon, null)
   }, imageClsList.length > 0 && React.createElement("div", {
     style: {
       padding: 8

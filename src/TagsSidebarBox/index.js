@@ -58,7 +58,7 @@ export const TagsSidebarBox = ({
       title="Image Tags"
       expandedByDefault
       noScroll
-      icon={<StyleIcon style={{ color: grey[700] }} />}
+      icon={<StyleIcon/>}
     >
       {imageClsList.length > 0 && (
         <div style={{ padding: 8 }}>

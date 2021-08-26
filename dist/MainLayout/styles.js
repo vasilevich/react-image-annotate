@@ -19,7 +19,6 @@ export default {
   },
   headerTitle: {
     fontWeight: "bold",
-    color: grey[700],
     paddingLeft: 16
   }
 };

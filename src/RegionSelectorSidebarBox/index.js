@@ -20,7 +20,7 @@ import isEqual from "lodash/isEqual"
 const useStyles = makeStyles(styles)
 
 const HeaderSep = styled("div")({
-  borderTop: `1px solid ${grey[200]}`,
+  borderTop: `1px solid`,
   marginTop: 2,
   marginBottom: 2,
 })
@@ -100,7 +100,7 @@ const RowHeader = ({
     visible={<VisibleIcon className="icon" onClick={()=>{
       regions.forEach(r=>{
         onChangeRegion({ ...r, visible: !vis[0] })
-        
+
       })
       vis[1](!vis[0])
     }} />}
@@ -170,7 +170,7 @@ const Row = ({
               onChangeRegion({ ...r, visible: false,highlighted:false })
             }}
             className="icon2"
-          /> 
+          />
         ) : (
           <VisibleOffIcon
             onClick={(e) => {
@@ -213,7 +213,7 @@ export const RegionSelectorSidebarBox = ({
       title="Regions"
       key={'sidebarregionsbox'}
       subTitle=""
-      icon={<RegionIcon style={{ color: grey[700] }} />}
+      icon={<RegionIcon/>}
       expandedByDefault
     >
       <div className={classes.container}>

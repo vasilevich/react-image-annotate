@@ -4,7 +4,6 @@ import React, { memo } from "react"
 import SidebarBoxContainer from "../SidebarBoxContainer"
 import DescriptionIcon from "@material-ui/icons/Description"
 import { styled } from "@material-ui/core/styles"
-import { grey } from "@material-ui/core/colors"
 import Markdown from "react-markdown"
 
 const MarkdownContainer = styled("div")({
@@ -26,7 +25,7 @@ export const TaskDescriptionSidebarBox = ({ description }) => {
   return (
     <SidebarBoxContainer
       title="Task Description"
-      icon={<DescriptionIcon style={{ color: grey[700] }} />}
+      icon={<DescriptionIcon/>}
       expandedByDefault={description && description !== "" ? false : true}
     >
       <MarkdownContainer>

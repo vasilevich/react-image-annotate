@@ -26,7 +26,6 @@ var ButtonInnerContent = styled("div")({
 var IconContainer = styled("div")(function (_ref) {
   var textHidden = _ref.textHidden;
   return {
-    color: colors.grey[700],
     height: textHidden ? 32 : 20,
     paddingTop: textHidden ? 8 : 0,
     "& .MuiSvgIcon-root": {
@@ -38,7 +37,6 @@ var IconContainer = styled("div")(function (_ref) {
 var Text = styled("div")({
   fontWeight: "bold",
   fontSize: 11,
-  color: colors.grey[800],
   display: "flex",
   alignItems: "center",
   lineHeight: 1,

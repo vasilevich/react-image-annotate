@@ -26,9 +26,7 @@ var useStyles = makeStyles({
     fontWeight: "bold",
     flexGrow: 1,
     paddingLeft: 8,
-    color: grey[800],
     "& span": {
-      color: grey[600],
       fontSize: 12
     }
   },

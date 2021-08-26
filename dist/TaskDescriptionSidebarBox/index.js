@@ -2,7 +2,6 @@ import React, { memo } from "react";
 import SidebarBoxContainer from "../SidebarBoxContainer";
 import DescriptionIcon from "@material-ui/icons/Description";
 import { styled } from "@material-ui/core/styles";
-import { grey } from "@material-ui/core/colors";
 import Markdown from "react-markdown";
 var MarkdownContainer = styled("div")({
   paddingLeft: 16,
@@ -38,11 +37,7 @@ export var TaskDescriptionSidebarBox = function TaskDescriptionSidebarBox(_ref) 
   var description = _ref.description;
   return React.createElement(SidebarBoxContainer, {
     title: "Task Description",
-    icon: React.createElement(DescriptionIcon, {
-      style: {
-        color: grey[700]
-      }
-    }),
+    icon: React.createElement(DescriptionIcon, null),
     expandedByDefault: description && description !== "" ? false : true
   }, React.createElement(MarkdownContainer, null, React.createElement(Markdown, {
     source: description

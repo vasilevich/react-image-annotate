@@ -78,7 +78,6 @@ export const RegionTags = ({
                 left: 0,
                 ...(displayOnTop ? { bottom: 0 } : { top: 0 }),
                 zIndex: 10,
-               // backgroundColor: "#fff",
                 borderRadius: 4,
                 padding: 2,
                 paddingBottom: 0,

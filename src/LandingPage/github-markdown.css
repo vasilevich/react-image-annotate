@@ -149,17 +149,14 @@
 }
 
 .markdown-body .pl-md {
-  background-color: #ffeef0;
   color: #b31d28;
 }
 
 .markdown-body .pl-mi1 {
-  background-color: #f0fff4;
   color: #22863a;
 }
 
 .markdown-body .pl-mc {
-  background-color: #ffebda;
   color: #e36209;
 }
 
@@ -418,11 +415,9 @@
 }
 
 .markdown-body .bg-white {
-  background-color: #fff !important;
 }
 
 .markdown-body .bg-gray-light {
-  background-color: #fafbfc !important;
 }
 
 .markdown-body .text-gray-light {
@@ -529,7 +524,6 @@
 }
 
 .markdown-body hr {
-  background-color: #e1e4e8;
   border: 0;
   height: 0.25em;
   margin: 24px 0;

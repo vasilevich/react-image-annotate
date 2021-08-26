@@ -51,11 +51,7 @@ var KeyframesSelectorSidebarBox = function KeyframesSelectorSidebarBox(_ref) {
   return React.createElement(SidebarBoxContainer, {
     title: "Keyframes",
     subTitle: "",
-    icon: React.createElement(AddLocationIcon, {
-      style: {
-        color: colors.grey[700]
-      }
-    }),
+    icon: React.createElement(AddLocationIcon, null),
     expandedByDefault: true
   }, keyframeTimes.map(function (t) {
     var _keyframes$t;

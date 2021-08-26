@@ -4,7 +4,6 @@ export default {
   container: {
     fontSize: 11,
     fontWeight: "bold",
-    color: grey[700],
     "& .icon": {
       marginTop: 4,
       width: 16,
@@ -25,14 +24,12 @@ export default {
     padding: 4,
     cursor: "pointer",
     "&.header:hover": {
-      backgroundColor: "#fff",
     },
     "&.highlighted": {
       backgroundColor: blue[100],
     },
     "&:hover": {
       backgroundColor: blue[50],
-      color: grey[800],
     },
   },
   chip: {

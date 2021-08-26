@@ -22,11 +22,7 @@ export var ImageSelectorSidebarBox = function ImageSelectorSidebarBox(_ref) {
   return React.createElement(SidebarBoxContainer, {
     title: "Images",
     subTitle: "(".concat(images.length, ")"),
-    icon: React.createElement(CollectionsIcon, {
-      style: {
-        color: grey[700]
-      }
-    })
+    icon: React.createElement(CollectionsIcon, null)
   }, React.createElement("div", null, React.createElement(List, null, images.map(function (img, i) {
     return React.createElement(ListItem, {
       button: true,

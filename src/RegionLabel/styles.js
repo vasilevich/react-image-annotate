@@ -20,7 +20,6 @@ export default {
     },
     // pointerEvents: "none",
     fontWeight: 600,
-    color: grey[900],
     padding: 8,
     "& .name": {
       display: "flex",
@@ -36,7 +35,6 @@ export default {
     },
     "& .tags": {
       "& .tag": {
-        color: grey[700],
         display: "inline-block",
         margin: 1,
         fontSize: 10,

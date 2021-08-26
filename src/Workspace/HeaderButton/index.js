@@ -30,7 +30,6 @@ const ButtonInnerContent = styled("div")({
   flexDirection: "column",
 })
 const IconContainer = styled("div")(({ textHidden }) => ({
-  color: colors.grey[700],
   height: textHidden ? 32 : 20,
   paddingTop: textHidden ? 8 : 0,
   "& .MuiSvgIcon-root": {
@@ -41,7 +40,6 @@ const IconContainer = styled("div")(({ textHidden }) => ({
 const Text = styled("div")({
   fontWeight: "bold",
   fontSize: 11,
-  color: colors.grey[800],
   display: "flex",
   alignItems: "center",
   lineHeight: 1,

@@ -11,7 +11,6 @@ const myContainerDiv=(props)=>{
 const Container = styled(myContainerDiv)({
   width: "100%",
   display: "flex",
-  //backgroundColor: "#fff",
   borderBottom: "1px solid #ccc",
   alignItems: "center",
   flexShrink: 1,

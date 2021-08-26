@@ -1,7 +1,6 @@
 // @flow
 
 import React, { useState, memo, useCallback } from "react"
-import Paper from "@material-ui/core/Paper"
 import { makeStyles, useTheme } from "@material-ui/core/styles"
 import ExpandIcon from "@material-ui/icons/ExpandMore"
 import IconButton from "@material-ui/core/IconButton"
@@ -12,7 +11,7 @@ import useEventCallback from "use-event-callback"
 import Typography from "@material-ui/core/Typography"
 import { useIconDictionary } from "../icon-dictionary.js"
 import ResizePanel from "@seveibar/react-resize-panel"
- 
+
 const useStyles = makeStyles({
   container: {
     borderBottom: `2px solid ${grey[400]}`,
@@ -26,7 +25,6 @@ const useStyles = makeStyles({
     paddingLeft: 16,
     paddingRight: 12,
     "& .iconContainer": {
-      color: grey[600],
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -41,9 +39,7 @@ const useStyles = makeStyles({
     flexGrow: 1,
     fontWeight: 800,
     paddingLeft: 8,
-    color: grey[800],
     "& span": {
-      color: grey[600],
       fontSize: 11
     }
   },
@@ -115,11 +111,10 @@ export const SidebarBox = ({
 
   const toggleExpanded = useEventCallback(() => changeExpanded(!expanded))
   const customIconMapping = useIconDictionary()
-  const theme = useTheme()
   const TitleIcon = customIconMapping[title.toLowerCase()]
   return (
     <div className={classes.container}>
-      <div className={classes.header} style={{position:'sticky',top:0,background:theme.palette.background.paper,zIndex:1}}>
+      <div className={classes.header} style={{position:'sticky',top:0,zIndex:1}}>
         <div className="iconContainer">
           {icon || <TitleIcon className={classes.titleIcon} />}
         </div>

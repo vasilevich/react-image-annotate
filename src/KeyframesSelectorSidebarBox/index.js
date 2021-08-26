@@ -55,7 +55,7 @@ const KeyframesSelectorSidebarBox = ({
     <SidebarBoxContainer
       title="Keyframes"
       subTitle=""
-      icon={<AddLocationIcon style={{ color: colors.grey[700] }} />}
+      icon={<AddLocationIcon/>}
       expandedByDefault
     >
       {keyframeTimes.map((t) => (

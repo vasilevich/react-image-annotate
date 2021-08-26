@@ -18,7 +18,7 @@ import classnames from "classnames";
 import isEqual from "lodash/isEqual";
 var useStyles = makeStyles(styles);
 var HeaderSep = styled("div")({
-  borderTop: "1px solid ".concat(grey[200]),
+  borderTop: "1px solid",
   marginTop: 2,
   marginBottom: 2
 });
@@ -243,11 +243,7 @@ export var RegionSelectorSidebarBox = function RegionSelectorSidebarBox(_ref5) {
     title: "Regions",
     key: 'sidebarregionsbox',
     subTitle: "",
-    icon: React.createElement(RegionIcon, {
-      style: {
-        color: grey[700]
-      }
-    }),
+    icon: React.createElement(RegionIcon, null),
     expandedByDefault: true
   }, React.createElement("div", {
     className: classes.container

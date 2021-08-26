@@ -241,11 +241,13 @@ export var MainLayout = function MainLayout(_ref2) {
     hideHeader: hideHeader,
     hideHeaderText: hideHeaderText,
     headerLeftSide: [state.annotationType === "video" ? React.createElement(KeyframeTimeline, {
+      key: 1,
       currentTime: state.currentVideoTime,
       duration: state.videoDuration,
       onChangeCurrentTime: action("CHANGE_VIDEO_TIME", "newTime"),
       keyframes: state.keyframes
     }) : activeImage ? React.createElement("div", {
+      key: 2,
       className: classes.headerTitle
     }, activeImage.name) : null].filter(Boolean),
     headerSubSection: headerSubSection,
@@ -320,8 +322,10 @@ export var MainLayout = function MainLayout(_ref2) {
     }) || React.createElement(React.Fragment, {
       key: "bjdd"
     }))].concat(_toConsumableArray(rightSidebarInjectedSections || []), [state.taskDescription && !hideRightSidebarSections.tasks && React.createElement(TaskDescription, {
+      key: 10,
       description: state.taskDescription
     }), state.labelImages && React.createElement(TagsSidebarBox, {
+      key: 3,
       currentImage: activeImage,
       imageClsList: state.imageClsList,
       imageTagList: state.imageTagList,
@@ -334,12 +338,14 @@ export var MainLayout = function MainLayout(_ref2) {
     //   />
     // ),
     React.createElement(RegionSelector, {
+      key: 4,
       regions: activeImage ? activeImage.regions : emptyArr,
       state: state,
       onSelectRegion: action("SELECT_REGION", "region"),
       onDeleteRegion: action("DELETE_REGION", "region"),
       onChangeRegion: action("CHANGE_REGION", "region")
     }), state.keyframes && React.createElement(KeyframesSelector, {
+      key: 5,
       onChangeVideoTime: action("CHANGE_VIDEO_TIME", "newTime"),
       onDeleteKeyframe: action("DELETE_KEYFRAME", "time"),
       onChangeCurrentTime: action("CHANGE_VIDEO_TIME", "newTime"),
@@ -347,6 +353,7 @@ export var MainLayout = function MainLayout(_ref2) {
       duration: state.videoDuration,
       keyframes: state.keyframes
     }), !hideRightSidebarSections.history && React.createElement(HistorySidebarBox, {
+      key: 6,
       history: state.history,
       onRestoreHistory: action("RESTORE_HISTORY")
     })], _toConsumableArray(rightSidebarInjectedSectionsBottom || [])).filter(Boolean)

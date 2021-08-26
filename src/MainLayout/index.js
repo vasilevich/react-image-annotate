@@ -141,14 +141,14 @@ export const MainLayout = ({
   // {
   //   console.debug(`MainlayoutRender::tagger!!render`,{readOnly: state.readOnly})
   // }
-  
+
   const refocusOnMouseEvent = useCallback((e) => {
     if (!innerContainerRef.current) return
     if (innerContainerRef.current.contains(document.activeElement)) return
     if (innerContainerRef.current.contains(e.target)) {
       innerContainerRef.current.focus()
       e.target.focus()
-    } 
+    }
   }, [])
 
   const canvas = (
@@ -273,13 +273,14 @@ export const MainLayout = ({
             headerLeftSide={[
               state.annotationType === "video" ? (
                 <KeyframeTimeline
+                  key={1}
                   currentTime={state.currentVideoTime}
                   duration={state.videoDuration}
                   onChangeCurrentTime={action("CHANGE_VIDEO_TIME", "newTime")}
                   keyframes={state.keyframes}
                 />
               ) : activeImage ? (
-                <div className={classes.headerTitle}>{activeImage.name}</div>
+                <div key={2} className={classes.headerTitle}>{activeImage.name}</div>
               ) : null,
             ].filter(Boolean)}
             headerSubSection={headerSubSection}
@@ -292,7 +293,7 @@ export const MainLayout = ({
                 ? null
                 : !state.videoPlaying
                 ? { name: "Play" }
-                : { name: "Pause" },              
+                : { name: "Pause" },
               !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && { name: "Settings" },
               !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) &&  (state.fullScreen ? { name: "Window" } : { name: "Fullscreen" }),
               !(topBarOpts && topBarOpts.hide && topBarOpts.hide.save) && { name: "Save" },
@@ -369,10 +370,11 @@ export const MainLayout = ({
               ),
               ...rightSidebarInjectedSections || [],
               state.taskDescription && !hideRightSidebarSections.tasks && (
-                <TaskDescription description={state.taskDescription} />
+                <TaskDescription key={10} description={state.taskDescription} />
               ),
               state.labelImages && (
                 <TagsSidebarBox
+                  key={3}
                   currentImage={activeImage}
                   imageClsList={state.imageClsList}
                   imageTagList={state.imageTagList}
@@ -387,6 +389,7 @@ export const MainLayout = ({
               //   />
               // ),
               <RegionSelector
+                key={4}
                 regions={activeImage ? activeImage.regions : emptyArr}
                 state={state}
                 onSelectRegion={action("SELECT_REGION", "region")}
@@ -395,6 +398,7 @@ export const MainLayout = ({
               />,
               state.keyframes && (
                 <KeyframesSelector
+                  key={5}
                   onChangeVideoTime={action("CHANGE_VIDEO_TIME", "newTime")}
                   onDeleteKeyframe={action("DELETE_KEYFRAME", "time")}
                   onChangeCurrentTime={action("CHANGE_VIDEO_TIME", "newTime")}
@@ -404,6 +408,7 @@ export const MainLayout = ({
                 />
               ),
             !hideRightSidebarSections.history &&   <HistorySidebarBox
+                key={6}
                 history={state.history}
                 onRestoreHistory={action("RESTORE_HISTORY")}
               />,

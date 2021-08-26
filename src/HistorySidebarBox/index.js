@@ -19,7 +19,6 @@ const useStyles = makeStyles({
   emptyText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: grey[500],
     textAlign: "center",
     padding: 20,
   },
@@ -38,7 +37,7 @@ export const HistorySidebarBox = ({
   return (
     <SidebarBoxContainer
       title="History"
-      icon={<HistoryIcon style={{ color: grey[700] }} />}
+      icon={<HistoryIcon/>}
       expandedByDefault
     >
       <List>

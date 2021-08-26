@@ -549,7 +549,7 @@ storiesOf("Annotator", module)
       onOpen,
     }) => {
       return (
-        <div style={{ backgroundColor: "white" }}>
+        <div>
           I'm the closed part
           <div style={{ display: editing ? "block" : "none" }}>
             I'm the part that shows when it's being edited!

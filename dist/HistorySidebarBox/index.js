@@ -16,7 +16,6 @@ var useStyles = makeStyles({
   emptyText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: grey[500],
     textAlign: "center",
     padding: 20
   }
@@ -30,11 +29,7 @@ export var HistorySidebarBox = function HistorySidebarBox(_ref) {
   var classes = useStyles();
   return React.createElement(SidebarBoxContainer, {
     title: "History",
-    icon: React.createElement(HistoryIcon, {
-      style: {
-        color: grey[700]
-      }
-    }),
+    icon: React.createElement(HistoryIcon, null),
     expandedByDefault: true
   }, React.createElement(List, null, history.length === 0 && React.createElement("div", {
     className: classes.emptyText
