@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsAlt, faMousePointer, faExpandArrowsAlt, faGripLines, faTag, faPaintBrush, faCrosshairs, faDrawPolygon, faVectorSquare, faHandPaper, faSearch, faMask, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsAlt, faMousePointer, faExpandArrowsAlt, faGripLines, faTag, faPaintBrush, faCrosshairs, faDrawPolygon, faVectorSquare, faHandPaper, faSearch, faMask, faEdit, faChartLine } from "@fortawesome/free-solid-svg-icons";
 import FullscreenIcon from "@material-ui/icons/Fullscreen";
 import AccessibilityNewIcon from "@material-ui/icons/AccessibilityNew";
 var faStyle = {
@@ -72,6 +72,14 @@ export var iconDictionary = {
       size: "xs",
       fixedWidth: true,
       icon: faGripLines
+    });
+  },
+  "create-line": function createLine() {
+    return React.createElement(FontAwesomeIcon, {
+      style: faStyle,
+      size: "xs",
+      fixedWidth: true,
+      icon: faChartLine
     });
   },
   "show-mask": function showMask() {

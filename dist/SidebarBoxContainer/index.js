@@ -8,7 +8,7 @@ import Collapse from "@material-ui/core/Collapse";
 import { grey } from "@material-ui/core/colors";
 import classnames from "classnames";
 import useEventCallback from "use-event-callback";
-import SidebarBox from "../Workspace/SidebarBox";
+import SidebarBox from "react-material-workspace-layout/SidebarBox";
 var useStyles = makeStyles({
   container: {
     margin: 8
@@ -47,6 +47,8 @@ var useStyles = makeStyles({
     }
   },
   expandedContent: {
+    maxHeight: 300,
+    overflowY: "auto",
     "&.noScroll": {
       overflowY: "visible",
       overflow: "visible"

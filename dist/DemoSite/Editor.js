@@ -56,7 +56,8 @@ export var examples = {
       }, {
         src: "https://www.bianchi.com/wp-content/uploads/2019/07/YPB17I555K.jpg",
         name: "bianchi-oltre-xr4"
-      }]
+      }],
+      allowComments: true
     };
   },
   "Simple Segmentation": function SimpleSegmentation() {
@@ -165,7 +166,7 @@ var Editor = function Editor(_ref) {
     className: c.specificationArea
   }, React.createElement("h2", null, "React Image Annotate Format"), React.createElement(Code, {
     language: "javascript"
-  }, "\n{\n  taskDescription?: string, // markdown\n  regionTagList?: Array<string>,\n  regionClsList?: Array<string>,\n  imageTagList?: Array<string>,\n  imageClsList?: Array<string>,\n  // all tools are enabled by default\n  enabledTools?: Array< \"select\" | \"create-point\" | \"create-box\" | \"create-polygon\">,\n  selectedImage?: string, // initial selected image\n  images: Array<{\n    src: string,\n    thumbnailSrc?: string, // use this if you are using high-res images\n    name: string,\n    regions?: Array<{\n      id: string | number,\n      cls?: string,\n      color?: string,\n      tags?: Array<string>,\n\n      // Point\n      type: \"point\",\n      x: number, // [0-1] % of image width\n      y: number, // [0-1] % of image height\n\n      // Bounding Box\n      type: \"box\",\n      x: number, // [0-1] % of image width\n      y: number, // [0-1] % of image height\n      w: number, // [0-1] % of image width\n      h: number, // [0-1] % of image height\n\n      // Polygon\n      type: \"polygon\",\n      open?: boolean, // should last and first points be connected, default: true\n      points: Array<[number, number]> // [0-1] % of image width/height\n    }>\n  }>,\n}\n")), React.createElement(Dialog, {
+  }, "\n{\n  taskDescription?: string, // markdown\n  regionTagList?: Array<string>,\n  regionClsList?: Array<string>,\n  imageTagList?: Array<string>,\n  imageClsList?: Array<string>,\n  // all tools are enabled by default\n  enabledTools?: Array< \"select\" | \"create-point\" | \"create-box\" | \"create-polygon\" | \"create-line\">,\n  selectedImage?: string, // initial selected image\n  images: Array<{\n    src: string,\n    thumbnailSrc?: string, // use this if you are using high-res images\n    name: string,\n    regions?: Array<{\n      id: string | number,\n      cls?: string,\n      color?: string,\n      tags?: Array<string>,\n\n      // Point\n      type: \"point\",\n      x: number, // [0-1] % of image width\n      y: number, // [0-1] % of image height\n\n      // Bounding Box\n      type: \"box\",\n      x: number, // [0-1] % of image width\n      y: number, // [0-1] % of image height\n      w: number, // [0-1] % of image width\n      h: number, // [0-1] % of image height\n\n      // Polygon\n      type: \"polygon\",\n      open?: boolean, // should last and first points be connected, default: true\n      points: Array<[number, number]> // [0-1] % of image width/height\n    }>\n  }>,\n}\n")), React.createElement(Dialog, {
     fullScreen: true,
     open: outputDialogOpen
   }, React.createElement(DialogTitle, null, "React Image Annotate Output"), React.createElement(DialogContent, {

@@ -21,12 +21,7 @@ import VideoOrImageCanvasBackground from "../VideoOrImageCanvasBackground";
 import useEventCallback from "use-event-callback";
 import RegionShapes from "../RegionShapes";
 import useWasdMode from "./use-wasd-mode";
-import getActiveImage from "../Annotator/reducers/get-active-image";
-import { SetLatestMAtForControl } from "../Annotator/moduleDispatcher";
 var useStyles = makeStyles(styles);
-export var defaultMat = {
-  lastMat: undefined
-};
 
 var getDefaultMat = function getDefaultMat() {
   var allowedArea = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -35,24 +30,21 @@ var getDefaultMat = function getDefaultMat() {
       iw = _ref.iw,
       ih = _ref.ih;
 
-  var mat = defaultMat.lastMat || Matrix.from(1, 0, 0, 1, -10, -10);
+  var mat = Matrix.from(1, 0, 0, 1, -10, -10);
 
   if (allowedArea && iw) {
-    mat = mat.translate(allowedArea.x * iw, allowedArea.y * ih);
+    mat = mat.translate(allowedArea.x * iw, allowedArea.y * ih).scaleU(allowedArea.w + 0.05);
   }
 
-  defaultMat.lastMat = mat;
   return mat;
 };
 
 export var ImageCanvas = function ImageCanvas(_ref2) {
-  var state = _ref2.state,
-      regions = _ref2.regions,
+  var regions = _ref2.regions,
       imageSrc = _ref2.imageSrc,
       videoSrc = _ref2.videoSrc,
       videoTime = _ref2.videoTime,
       realSize = _ref2.realSize,
-      activeImage = _ref2.activeImage,
       showTags = _ref2.showTags,
       _ref2$onMouseMove = _ref2.onMouseMove,
       onMouseMove = _ref2$onMouseMove === void 0 ? function (p) {
@@ -107,7 +99,8 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
       zoomOnAllowedArea = _ref2$zoomOnAllowedAr === void 0 ? true : _ref2$zoomOnAllowedAr,
       _ref2$modifyingAllowe = _ref2.modifyingAllowedArea,
       modifyingAllowedArea = _ref2$modifyingAllowe === void 0 ? false : _ref2$modifyingAllowe,
-      keypointDefinitions = _ref2.keypointDefinitions;
+      keypointDefinitions = _ref2.keypointDefinitions,
+      allowComments = _ref2.allowComments;
   var classes = useStyles();
   var canvasEl = useRef(null);
   var layoutParams = useRef({});
@@ -139,7 +132,6 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
 
   var maskImages = useRef({});
   var windowSize = useWindowSize();
-  var LastImageLoaded = useState('');
   var getLatestMat = useEventCallback(function () {
     return mat;
   });
@@ -183,7 +175,6 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
       changeImageDimensions = _useState2[1];
 
   var imageLoaded = Boolean(imageDimensions && imageDimensions.naturalWidth);
-  var canvas = canvasEl.current;
   var onVideoOrImageLoaded = useEventCallback(function (_ref3) {
     var naturalWidth = _ref3.naturalWidth,
         naturalHeight = _ref3.naturalHeight,
@@ -197,14 +188,16 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     changeImageDimensions(dims); // Redundant update to fix rerendering issues
 
     setTimeout(function () {
-      changeImageDimensions(dims);
+      return changeImageDimensions(dims);
     }, 10);
   });
+  var excludePattern = useExcludePattern();
+  var canvas = canvasEl.current;
 
-  if (canvas && imageLoaded && LastImageLoaded[0] != imageSrc) {
+  if (canvas && imageLoaded) {
     var clientWidth = canvas.clientWidth,
         clientHeight = canvas.clientHeight;
-    var fitScale = Math.max(imageDimensions.naturalWidth / (clientWidth - 20), imageDimensions.naturalHeight / (clientHeight - 20)); // const fitScale = 1
+    var fitScale = Math.max(imageDimensions.naturalWidth / (clientWidth - 20), imageDimensions.naturalHeight / (clientHeight - 20));
 
     var _iw = imageDimensions.naturalWidth / fitScale,
         _ih = imageDimensions.naturalHeight / fitScale;
@@ -216,16 +209,12 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
       canvasWidth: clientWidth,
       canvasHeight: clientHeight
     };
-    LastImageLoaded[1](imageSrc);
-    console.debug("SetLayoutParams", layoutParams.current);
   }
 
-  var excludePattern = useExcludePattern();
   useEffect(function () {
     if (!imageLoaded) return;
     changeMat(getDefaultMat(zoomOnAllowedArea ? allowedArea : null, layoutParams.current)); // eslint-disable-next-line
   }, [imageLoaded]);
-  defaultMat.lastMat = mat;
   useLayoutEffect(function () {
     if (!imageDimensions) return;
     var clientWidth = canvas.clientWidth,
@@ -299,9 +288,7 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     if (highlightedRegions.length !== 1) return null;
     return highlightedRegions[0];
   }, [regions]);
-  SetLatestMAtForControl(state, mat);
   return React.createElement("div", {
-    className: "imageCanvasInstaceClass",
     style: {
       width: "100%",
       height: "100%",
@@ -315,7 +302,6 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     mousePosition: mousePosition
   }), imageLoaded && !dragging && React.createElement(RegionSelectAndTransformBoxes, {
     key: "regionSelectAndTransformBoxes",
-    state: state,
     regions: !modifyingAllowedArea || !allowedArea ? regions : [{
       type: "box",
       id: "$$allowed_area",
@@ -345,7 +331,6 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
   }), imageLoaded && showTags && !dragging && React.createElement(PreventScrollToParents, {
     key: "regionTags"
   }, React.createElement(RegionTags, {
-    state: state,
     regions: regions,
     projectRegionBox: projectRegionBox,
     mouseEvents: mouseEvents,
@@ -358,11 +343,9 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     layoutParams: layoutParams,
     imageSrc: imageSrc,
     RegionEditLabel: RegionEditLabel,
-    onRegionClassAdded: onRegionClassAdded
+    onRegionClassAdded: onRegionClassAdded,
+    allowComments: allowComments
   })), !showTags && highlightedRegion && React.createElement("div", {
-    onClick: function onClick() {
-      console.debug('REACTSTATE', state);
-    },
     key: "topLeftTag",
     className: classes.fixedRegionLabel
   }, React.createElement(RegionLabel, {
@@ -374,7 +357,7 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     editing: true,
     region: highlightedRegion,
     imageSrc: imageSrc,
-    state: state
+    allowComments: allowComments
   })), zoomWithPrimary && zoomBox !== null && React.createElement("div", {
     key: "zoomBox",
     style: {
@@ -419,7 +402,6 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     fullSegmentationMode: fullImageSegmentationMode
   }), React.createElement(VideoOrImageCanvasBackground, {
     videoPlaying: videoPlaying,
-    state: state,
     imagePosition: imagePosition,
     mouseEvents: mouseEvents,
     onLoad: onVideoOrImageLoaded,
@@ -429,25 +411,7 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     useCrossOrigin: fullImageSegmentationMode,
     onChangeVideoTime: onChangeVideoTime,
     onChangeVideoPlaying: onChangeVideoPlaying
-  }), activeImage && activeImage.heatmaps && activeImage.heatmaps.length && activeImage.heatmaps.map(function (url, i) {
-    return React.createElement(VideoOrImageCanvasBackground, {
-      key: url + i,
-      state: state,
-      videoPlaying: false,
-      imagePosition: imagePosition,
-      mouseEvents: mouseEvents,
-      imageSrc: url,
-      useCrossOrigin: fullImageSegmentationMode
-    });
   }))), React.createElement("div", {
-    onClick: function onClick() {
-      var ac = getActiveImage(state);
-      console.debug('REACTSTATE', {
-        img: ac && state.images[ac.currentImageIndex],
-        activeImg: ac,
-        state: state
-      });
-    },
     className: classes.zoomIndicator
   }, (1 / mat.a * 100).toFixed(0), "%"));
 };

@@ -36,7 +36,7 @@ export var PointDistances = function PointDistances(_ref) {
       return i2 > i1;
     }).filter(function (r2) {
       return r2.type === "point";
-    }).map(function (r2) {
+    }).map(function (r2, i2) {
       var pr1 = projectRegionBox(r1);
       var pr2 = projectRegionBox(r2);
       var prm = {
@@ -54,7 +54,9 @@ export var PointDistances = function PointDistances(_ref) {
         displayDistance = (Math.sqrt(Math.pow(r1.x - r2.x, 2) + Math.pow(r1.y - r2.y, 2)) * 100).toFixed(pointDistancePrecision) + "%";
       }
 
-      return React.createElement(Fragment, null, React.createElement("path", {
+      return React.createElement(Fragment, {
+        key: i2
+      }, React.createElement("path", {
         d: "M".concat(pr1.x + pr1.w / 2, ",").concat(pr1.y + pr1.h / 2, " L").concat(pr2.x + pr2.w / 2, ",").concat(pr2.y + pr2.h / 2)
       }), React.createElement("text", {
         x: prm.x,

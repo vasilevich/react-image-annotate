@@ -101,17 +101,12 @@ export var ImageMask = function ImageMask(_ref3) {
       return cp.cls;
     }).length < 2) return;
     var udtRegions = convertToUDTRegions(regions);
-    autoseg.setConfig(_objectSpread({
-      classNames: regionClsList
-    }, autoSegmentationOptions));
     autoseg.getMask(udtRegions).then(function (maskImageData) {
       var context = canvasRef.getContext("2d");
       context.clearRect(0, 0, maskImageData.width, maskImageData.height);
       context.putImageData(maskImageData, 0, 0);
-      console.debug('DEBOUNCE MASK AUTOSEG GOTMAST');
     });
-    console.debug('DEBOUNCE MASK AUTOSEG');
-  }, 1000, [canvasRef, sampleImageData, regions, hide, autoSegmentationOptions && autoSegmentationOptions.maxClusters]);
+  }, 1000, [canvasRef, sampleImageData, regions, hide]);
   var style = useMemo(function () {
     var width = imagePosition.bottomRight.x - imagePosition.topLeft.x;
     var height = imagePosition.bottomRight.y - imagePosition.topLeft.y;

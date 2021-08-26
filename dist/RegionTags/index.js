@@ -20,8 +20,7 @@ var copyWithout = function copyWithout(obj) {
 };
 
 export var RegionTags = function RegionTags(_ref) {
-  var state = _ref.state,
-      regions = _ref.regions,
+  var regions = _ref.regions,
       projectRegionBox = _ref.projectRegionBox,
       mouseEvents = _ref.mouseEvents,
       regionClsList = _ref.regionClsList,
@@ -33,24 +32,11 @@ export var RegionTags = function RegionTags(_ref) {
       layoutParams = _ref.layoutParams,
       imageSrc = _ref.imageSrc,
       RegionEditLabel = _ref.RegionEditLabel,
-      onRegionClassAdded = _ref.onRegionClassAdded;
+      onRegionClassAdded = _ref.onRegionClassAdded,
+      allowComments = _ref.allowComments;
   var RegionLabel = RegionEditLabel != null ? RegionEditLabel : DefaultRegionLabel;
-  var mode_onlycurrentRegion = {
-    "MOVE_REGION": true,
-    "RESIZE_BOX": true,
-    "MOVE_POLYGON_POINT": true,
-    "MOVE_KEYPOINT": true,
-    "DRAW_POLYGON": true,
-    "DRAW_EXPANDING_LINE": true
-  };
-  var ro = state.readOnly; // if(state.mode && mode_onlycurrentRegion[state.mode])
-  // {
-  //   console.debug('stateinghideothertagsmode!!',state.mode,state.regionId)
-  // }
-  // console.debug('RegionTags',{nrRe:regions.length,mode:state.mode,regionId:state.regionId})
-
   return regions.filter(function (r) {
-    return (r.visible || r.visible === undefined) && (!state.mode || !state.mode.mode || !mode_onlycurrentRegion[state.mode.mode] || state.mode && state.mode.mode && mode_onlycurrentRegion[state.mode.mode] && state.mode.regionId == r.id);
+    return r.visible || r.visible === undefined;
   }).map(function (region) {
     var pbox = projectRegionBox(region);
     var _layoutParams$current = layoutParams.current,
@@ -86,14 +72,14 @@ export var RegionTags = function RegionTags(_ref) {
           top: 0
         }, {
           zIndex: 10,
-          // backgroundColor: "#fff",
+          backgroundColor: "#fff",
           borderRadius: 4,
           padding: 2,
           paddingBottom: 0,
           opacity: 0.5,
           pointerEvents: "none"
         })
-      }, !ro && React.createElement(LockIcon, {
+      }, React.createElement(LockIcon, {
         style: {
           width: 16,
           height: 16,
@@ -145,7 +131,7 @@ export var RegionTags = function RegionTags(_ref) {
       regions: regions,
       imageSrc: imageSrc,
       onRegionClassAdded: onRegionClassAdded,
-      state: state
+      allowComments: allowComments
     })));
   });
 };

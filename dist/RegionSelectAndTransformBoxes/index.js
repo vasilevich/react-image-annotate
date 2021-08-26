@@ -5,10 +5,10 @@ import { styled } from "@material-ui/core/styles";
 import PreventScrollToParents from "../PreventScrollToParents";
 import { Tooltip } from "@material-ui/core";
 var TransformGrabber = styled("div")({
-  width: 10,
-  height: 10,
+  width: 8,
+  height: 8,
   zIndex: 2,
-  border: "2px solid #fd67f0",
+  border: "2px solid #FFF",
   position: "absolute"
 });
 var boxCursorMap = [["nw-resize", "n-resize", "ne-resize"], ["w-resize", "grab", "e-resize"], ["sw-resize", "s-resize", "se-resize"]];
@@ -19,7 +19,6 @@ var arePropsEqual = function arePropsEqual(prev, next) {
 
 export var RegionSelectAndTransformBox = memo(function (_ref) {
   var r = _ref.region,
-      state = _ref.state,
       mouseEvents = _ref.mouseEvents,
       projectRegionBox = _ref.projectRegionBox,
       dragWithPrimary = _ref.dragWithPrimary,
@@ -40,8 +39,6 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
   var _layoutParams$current = layoutParams.current,
       iw = _layoutParams$current.iw,
       ih = _layoutParams$current.ih;
-  var ro = state.readOnly;
-  var geopoints = r.type === "geometry" && r.geometry && r.geometry.coordinates && r.geometry.coordinates[0] || undefined;
   return React.createElement(Fragment, null, React.createElement(PreventScrollToParents, null, showHighlightBox && r.type !== "polygon" && React.createElement(HighlightBox, {
     region: r,
     mouseEvents: mouseEvents,
@@ -51,7 +48,7 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
     onBeginMovePoint: onBeginMovePoint,
     onSelectRegion: onSelectRegion,
     pbox: pbox
-  }), r.type === "box" && !dragWithPrimary && !zoomWithPrimary && !r.locked && r.highlighted && [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5]].map(function (_ref2, i) {
+  }), r.type === "box" && !dragWithPrimary && !zoomWithPrimary && !r.locked && r.highlighted && mat.a < 1.2 && [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5]].map(function (_ref2, i) {
     var _ref3 = _slicedToArray(_ref2, 2),
         px = _ref3[0],
         py = _ref3[1];
@@ -60,7 +57,7 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
       key: i
     }, mouseEvents, {
       onMouseDown: function onMouseDown(e) {
-        if (e.button === 0 && !ro) return onBeginBoxTransform(r, [px * 2 - 1, py * 2 - 1]);
+        if (e.button === 0) return onBeginBoxTransform(r, [px * 2 - 1, py * 2 - 1]);
         mouseEvents.onMouseDown(e);
       },
       style: {
@@ -80,7 +77,7 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
       key: i
     }, mouseEvents, {
       onMouseDown: function onMouseDown(e) {
-        if (e.button === 0 && (!r.open || i === 0) && !ro) return onBeginMovePolygonPoint(r, i);
+        if (e.button === 0 && (!r.open || i === 0)) return onBeginMovePolygonPoint(r, i);
         mouseEvents.onMouseDown(e);
       },
       style: {
@@ -105,7 +102,7 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
       key: i
     }, mouseEvents, {
       onMouseDown: function onMouseDown(e) {
-        if (e.button === 0 && !ro) return onAddPolygonPoint(r, pa, i + 1);
+        if (e.button === 0) return onAddPolygonPoint(r, pa, i + 1);
         mouseEvents.onMouseDown(e);
       },
       style: {
@@ -117,37 +114,12 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
         opacity: 0.5
       }
     }));
-  }), r.type === "geometry" && geopoints && r.highlighted && !dragWithPrimary && !zoomWithPrimary && !r.locked && !r.open && geopoints.length > 1 && geopoints.map(function (p1, i) {
-    return [p1, geopoints[(i + 1) % geopoints.length]];
-  }).map(function (_ref8) {
+  }), r.type === "keypoints" && !dragWithPrimary && !zoomWithPrimary && !r.locked && r.highlighted && Object.entries(r.points).map(function (_ref8, i) {
     var _ref9 = _slicedToArray(_ref8, 2),
-        p1 = _ref9[0],
-        p2 = _ref9[1];
-
-    return [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
-  }).map(function (pa, i) {
-    var proj = mat.clone().inverse().applyToPoint(pa[0] * iw, pa[1] * ih);
-    return React.createElement(TransformGrabber, Object.assign({
-      key: i
-    }, mouseEvents, {
-      onMouseDown: function onMouseDown(e) {
-        if (e.button === 0 && !ro) return onAddPolygonPoint(r, pa, i + 1);
-        mouseEvents.onMouseDown(e);
-      },
-      style: {
-        zIndex: 10,
-        left: proj.x - 4,
-        top: proj.y - 4,
-        border: "2px dotted #fff",
-        opacity: 0.5
-      }
-    }));
-  }), r.type === "keypoints" && !dragWithPrimary && !zoomWithPrimary && !r.locked && r.highlighted && Object.entries(r.points).map(function (_ref10, i) {
-    var _ref11 = _slicedToArray(_ref10, 2),
-        keypointId = _ref11[0],
-        _ref11$ = _ref11[1],
-        px = _ref11$.x,
-        py = _ref11$.y;
+        keypointId = _ref9[0],
+        _ref9$ = _ref9[1],
+        px = _ref9$.x,
+        py = _ref9$.y;
 
     var proj = mat.clone().inverse().applyToPoint(px * iw, py * ih);
     return React.createElement(Tooltip, {
@@ -157,7 +129,7 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
       key: i
     }, mouseEvents, {
       onMouseDown: function onMouseDown(e) {
-        if (e.button === 0 && (!r.open || i === 0) && !ro) return onBeginMoveKeypoint(r, keypointId);
+        if (e.button === 0 && (!r.open || i === 0)) return onBeginMoveKeypoint(r, keypointId);
         mouseEvents.onMouseDown(e);
       },
       style: {
@@ -171,14 +143,13 @@ export var RegionSelectAndTransformBox = memo(function (_ref) {
   })));
 }, arePropsEqual);
 export var RegionSelectAndTransformBoxes = memo(function (props) {
-  // console.debug('REgionSelectAndBoxes...',props.layoutParams)
   return props.regions.filter(function (r) {
     return r.visible || r.visible === undefined;
   }).filter(function (r) {
     return !r.locked;
   }).map(function (r, i) {
     return React.createElement(RegionSelectAndTransformBox, Object.assign({
-      key: "".concat(r.id)
+      key: r.id
     }, props, {
       region: r
     }));

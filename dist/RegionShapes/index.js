@@ -20,22 +20,27 @@ var RegionComponents = {
       fill: "transparent"
     }));
   }),
-  box: memo(function (_ref2) {
+  line: memo(function (_ref2) {
     var region = _ref2.region,
         iw = _ref2.iw,
         ih = _ref2.ih;
-    var point0 = [region.x, region.y];
-    return React.createElement(React.Fragment, null, region.text && point0 && React.createElement("text", {
-      x: point0[0] * iw,
-      y: point0[1] * ih,
-      style: {
-        fontWeight: 'bold',
-        background: '#77777722',
-        padding: 3,
-        fontSize: region.highlighted && '23pt' || '14pt'
-      },
-      fill: region.color
-    }, region.text), React.createElement("g", {
+    return React.createElement("g", {
+      transform: "translate(".concat(region.x1 * iw, " ").concat(region.y1 * ih, ")")
+    }, React.createElement("line", {
+      strokeWidth: 2,
+      x1: 0,
+      y1: 0,
+      x2: (region.x2 - region.x1) * iw,
+      y2: (region.y2 - region.y1) * ih,
+      stroke: colorAlpha(region.color, 0.75),
+      fill: colorAlpha(region.color, 0.25)
+    }));
+  }),
+  box: memo(function (_ref3) {
+    var region = _ref3.region,
+        iw = _ref3.iw,
+        ih = _ref3.ih;
+    return React.createElement("g", {
       transform: "translate(".concat(region.x * iw, " ").concat(region.y * ih, ")")
     }, React.createElement("rect", {
       strokeWidth: 2,
@@ -43,35 +48,8 @@ var RegionComponents = {
       y: 0,
       width: Math.max(region.w * iw, 0),
       height: Math.max(region.h * ih, 0),
-      stroke: colorAlpha(region.color, region.highlighted && 1 || 0.75),
-      fill: colorAlpha(region.color, region.highlighted && 0.4 || 0.25)
-    })));
-  }),
-  geometry: memo(function (_ref3) {
-    var _region$geometry;
-
-    var region = _ref3.region,
-        iw = _ref3.iw,
-        ih = _ref3.ih;
-    var point0 = ((_region$geometry = region.geometry) === null || _region$geometry === void 0 ? void 0 : _region$geometry.coordinates) && region.geometry.coordinates[0] && region.geometry.coordinates[0][0];
-    return region.geometry && region.geometry.coordinates && React.createElement(React.Fragment, null, region.text && point0 && React.createElement("text", {
-      x: point0[0] * iw,
-      y: point0[1] * ih,
-      style: {
-        fontWeight: 'bold',
-        background: '#77777722',
-        padding: 3,
-        fontSize: region.highlighted && '23pt' || '14pt'
-      },
-      fill: region.color
-    }, region.text), React.createElement("path", {
-      fill: colorAlpha(region.color, region.highlighted && 0.6 || 0.37),
-      fillRule: "evenodd",
-      d: region.geometry.coordinates.map(function (coords) {
-        return "M ".concat(coords.map(function (coord) {
-          return "".concat(coord[0] * iw, " ").concat(coord[1] * ih);
-        }).join(" "), " Z");
-      }).join(" ")
+      stroke: colorAlpha(region.color, 0.75),
+      fill: colorAlpha(region.color, 0.25)
     }));
   }),
   polygon: memo(function (_ref4) {
@@ -81,18 +59,7 @@ var RegionComponents = {
         fullSegmentationMode = _ref4.fullSegmentationMode;
     var Component = region.open ? "polyline" : "polygon";
     var alphaBase = fullSegmentationMode ? 0.5 : 1;
-    var point0 = region.points && region.points[0];
-    return React.createElement(React.Fragment, null, region.text && point0 && React.createElement("text", {
-      x: point0[0] * iw,
-      y: point0[1] * ih,
-      style: {
-        fontWeight: 'bold',
-        background: '#77777722',
-        padding: 3,
-        fontSize: region.highlighted && '23pt' || '14pt'
-      },
-      fill: region.color
-    }, region.text), React.createElement(Component, {
+    return React.createElement(Component, {
       points: region.points.map(function (_ref5) {
         var _ref6 = _slicedToArray(_ref5, 2),
             x = _ref6[0],
@@ -103,9 +70,9 @@ var RegionComponents = {
         return a.join(" ");
       }).join(" "),
       strokeWidth: 2,
-      stroke: colorAlpha(region.color, region.highlighted && 1 || 0.75),
-      fill: colorAlpha(region.color, region.highlighted && 0.5 || 0.25)
-    }));
+      stroke: colorAlpha(region.color, 0.75),
+      fill: colorAlpha(region.color, 0.25)
+    });
   }),
   keypoints: function keypoints(_ref7) {
     var region = _ref7.region,
@@ -258,7 +225,7 @@ export var WrappedRegionList = memo(function (_ref19) {
       ih = _ref19.ih,
       fullSegmentationMode = _ref19.fullSegmentationMode;
   return regions.filter(function (r) {
-    return r.visible !== false || r.highlighted;
+    return r.visible !== false;
   }).map(function (r) {
     var Component = RegionComponents[r.type];
     return React.createElement(Component, {

@@ -15,8 +15,7 @@ export default {
     opacity: 0.5,
     fontWeight: "bolder",
     fontSize: 14,
-    padding: 4,
-    zIndex: 2
+    padding: 4
   },
   fixedRegionLabel: {
     position: "absolute",
