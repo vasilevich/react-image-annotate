@@ -1,3 +1,4 @@
+import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
 import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
 import _objectWithoutProperties from "@babel/runtime/helpers/esm/objectWithoutProperties";
 import React, { useRef, useCallback } from "react";
@@ -16,7 +17,7 @@ import { useDispatchHotkeyHandlers } from "../ShortcutsManager";
 import { withHotKeys } from "react-hotkeys";
 import iconDictionary from "./icon-dictionary";
 import KeyframeTimeline from "../KeyframeTimeline";
-import Workspace from "react-material-workspace-layout/Workspace";
+import Workspace from "../Workspace/Workspace";
 import DebugBox from "../DebugSidebarBox";
 import TagsSidebarBox from "../TagsSidebarBox";
 import KeyframesSelector from "../KeyframesSelectorSidebarBox";
@@ -26,7 +27,6 @@ import ImageSelector from "../ImageSelectorSidebarBox";
 import HistorySidebarBox from "../HistorySidebarBox";
 import useEventCallback from "use-event-callback";
 import getHotkeyHelpText from "../utils/get-hotkey-help-text";
-import ClassSelectionMenu from "../ClassSelectionMenu";
 var emptyArr = [];
 var useStyles = makeStyles(styles);
 var HotkeyDiv = withHotKeys(function (_ref) {
@@ -58,6 +58,21 @@ export var MainLayout = function MainLayout(_ref2) {
       onRegionClassAdded = _ref2.onRegionClassAdded,
       hideHeader = _ref2.hideHeader,
       hideHeaderText = _ref2.hideHeaderText,
+      headerAddedItems = _ref2.headerAddedItems,
+      readOnly = _ref2.readOnly,
+      rightSidebarOnLeft = _ref2.rightSidebarOnLeft,
+      _ref2$hideRightSideba = _ref2.hideRightSidebarSections,
+      hideRightSidebarSections = _ref2$hideRightSideba === void 0 ? {
+    'tasks': true,
+    history: false
+  } : _ref2$hideRightSideba,
+      _ref2$rightSidebarInj = _ref2.rightSidebarInjectedSections,
+      rightSidebarInjectedSections = _ref2$rightSidebarInj === void 0 ? [] : _ref2$rightSidebarInj,
+      _ref2$rightSidebarInj2 = _ref2.rightSidebarInjectedSectionsBottom,
+      rightSidebarInjectedSectionsBottom = _ref2$rightSidebarInj2 === void 0 ? [] : _ref2$rightSidebarInj2,
+      topBarOpts = _ref2.topBarOpts,
+      headerSubSection = _ref2.headerSubSection,
+      controlId = _ref2.controlId,
       _ref2$hideNext = _ref2.hideNext,
       hideNext = _ref2$hideNext === void 0 ? false : _ref2$hideNext,
       _ref2$hidePrev = _ref2.hidePrev,
@@ -116,6 +131,19 @@ export var MainLayout = function MainLayout(_ref2) {
     dispatch: dispatch
   });
   var impliedVideoRegions = useImpliedVideoRegions(state);
+
+  if (state.readOnly !== readOnly) {
+    console.debug("InvokingActionForReadOnly!!", state.readOnly, readOnly);
+    dispatch({
+      type: "READONLY",
+      val: readOnly
+    });
+  } // if(state.readOnly)
+  // {
+  //   console.debug(`MainlayoutRender::tagger!!render`,{readOnly: state.readOnly})
+  // }
+
+
   var refocusOnMouseEvent = useCallback(function (e) {
     if (!innerContainerRef.current) return;
     if (innerContainerRef.current.contains(document.activeElement)) return;
@@ -126,12 +154,14 @@ export var MainLayout = function MainLayout(_ref2) {
     }
   }, []);
   var canvas = React.createElement(ImageCanvas, Object.assign({}, settings, {
+    state: state,
     showCrosshairs: settings.showCrosshairs && !["select", "pan", "zoom"].includes(state.selectedTool),
     key: state.selectedImage,
     showMask: state.showMask,
     fullImageSegmentationMode: state.fullImageSegmentationMode,
     autoSegmentationOptions: state.autoSegmentationOptions,
-    showTags: state.showTags,
+    showTags: !state.readOnly && state.showTags || false,
+    activeImage: activeImage,
     allowedArea: state.allowedArea,
     modifyingAllowedArea: state.selectedTool === "modify-allowed-area",
     regionClsList: state.regionClsList,
@@ -166,8 +196,7 @@ export var MainLayout = function MainLayout(_ref2) {
     onImageOrVideoLoaded: action("IMAGE_OR_VIDEO_LOADED", "metadata"),
     onChangeVideoTime: action("CHANGE_VIDEO_TIME", "newTime"),
     onChangeVideoPlaying: action("CHANGE_VIDEO_PLAYING", "isPlaying"),
-    onRegionClassAdded: onRegionClassAdded,
-    allowComments: state.allowComments
+    onRegionClassAdded: onRegionClassAdded
   }));
   var onClickIconSidebarItem = useEventCallback(function (item) {
     dispatch({
@@ -189,7 +218,6 @@ export var MainLayout = function MainLayout(_ref2) {
   });
   var debugModeOn = Boolean(window.localStorage.$ANNOTATE_DEBUG_MODE && state);
   var nextImageHasRegions = !nextImage || nextImage.regions && nextImage.regions.length > 0;
-  var key = "".concat(JSON.stringify(state), "_").concat(new Date().getDate());
   return React.createElement(FullScreenContainer, null, React.createElement(FullScreen, {
     handle: fullScreenHandle,
     onChange: function onChange(open) {
@@ -208,20 +236,23 @@ export var MainLayout = function MainLayout(_ref2) {
     className: classnames(classes.container, state.fullScreen && "Fullscreen")
   }, React.createElement(Workspace, {
     allowFullscreen: true,
+    rightSidebarOnLeft: rightSidebarOnLeft,
     iconDictionary: iconDictionary,
     hideHeader: hideHeader,
     hideHeaderText: hideHeaderText,
     headerLeftSide: [state.annotationType === "video" ? React.createElement(KeyframeTimeline, {
-      key: "".concat(key, "_1"),
       currentTime: state.currentVideoTime,
       duration: state.videoDuration,
       onChangeCurrentTime: action("CHANGE_VIDEO_TIME", "newTime"),
       keyframes: state.keyframes
     }) : activeImage ? React.createElement("div", {
-      key: "".concat(key, "_1"),
       className: classes.headerTitle
     }, activeImage.name) : null].filter(Boolean),
-    headerItems: [!hidePrev && {
+    headerSubSection: headerSubSection,
+    headerAddedItems: headerAddedItems,
+    headerItems: [!nextImageHasRegions && !(topBarOpts && topBarOpts.hide && topBarOpts.hide.clone) && !readOnly && activeImage.regions && {
+      name: "Clone"
+    }, !hidePrev && {
       name: "Prev"
     }, !hideNext && {
       name: "Next"
@@ -229,15 +260,13 @@ export var MainLayout = function MainLayout(_ref2) {
       name: "Play"
     } : {
       name: "Pause"
-    }, !nextImageHasRegions && activeImage.regions && {
-      name: "Clone"
-    }, {
+    }, !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && {
       name: "Settings"
-    }, state.fullScreen ? {
+    }, !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) && (state.fullScreen ? {
       name: "Window"
     } : {
       name: "Fullscreen"
-    }, {
+    }), !(topBarOpts && topBarOpts.hide && topBarOpts.hide.save) && {
       name: "Save"
     }].filter(Boolean),
     onClickHeaderItem: onClickHeaderItem,
@@ -255,7 +284,7 @@ export var MainLayout = function MainLayout(_ref2) {
       name: "zoom",
       helperText: "Zoom In/Out (scroll)" + getHotkeyHelpText("zoom_tool"),
       alwaysShowing: true
-    }, {
+    }, !state.readOnly && {
       name: "show-tags",
       helperText: "Show / Hide Tags",
       alwaysShowing: true
@@ -268,9 +297,6 @@ export var MainLayout = function MainLayout(_ref2) {
     }, {
       name: "create-polygon",
       helperText: "Add Polygon" + getHotkeyHelpText("create_polygon")
-    }, {
-      name: "create-line",
-      helperText: "Add Line"
     }, {
       name: "create-expanding-line",
       helperText: "Add Expanding Line"
@@ -287,20 +313,15 @@ export var MainLayout = function MainLayout(_ref2) {
     }].filter(Boolean).filter(function (a) {
       return a.alwaysShowing || state.enabledTools.includes(a.name);
     }),
-    rightSidebarItems: [debugModeOn && React.createElement(DebugBox, {
-      key: "".concat(key, "_1"),
+    rightSidebarItems: [debugModeOn && (React.createElement(DebugBox, {
+      key: 'bgh',
       state: debugModeOn,
       lastAction: state.lastAction
-    }), state.taskDescription && React.createElement(TaskDescription, {
-      key: "".concat(key, "_2"),
+    }) || React.createElement(React.Fragment, {
+      key: "bjdd"
+    }))].concat(_toConsumableArray(rightSidebarInjectedSections || []), [state.taskDescription && !hideRightSidebarSections.tasks && React.createElement(TaskDescription, {
       description: state.taskDescription
-    }), state.regionClsList && React.createElement(ClassSelectionMenu, {
-      key: "".concat(key, "_3"),
-      selectedCls: state.selectedCls,
-      regionClsList: state.regionClsList,
-      onSelectCls: action("SELECT_CLASSIFICATION", "cls")
     }), state.labelImages && React.createElement(TagsSidebarBox, {
-      key: "".concat(key, "_4"),
       currentImage: activeImage,
       imageClsList: state.imageClsList,
       imageTagList: state.imageTagList,
@@ -313,26 +334,23 @@ export var MainLayout = function MainLayout(_ref2) {
     //   />
     // ),
     React.createElement(RegionSelector, {
-      key: "".concat(key, "_5"),
       regions: activeImage ? activeImage.regions : emptyArr,
+      state: state,
       onSelectRegion: action("SELECT_REGION", "region"),
       onDeleteRegion: action("DELETE_REGION", "region"),
       onChangeRegion: action("CHANGE_REGION", "region")
     }), state.keyframes && React.createElement(KeyframesSelector, {
-      key: "".concat(key, "_6"),
       onChangeVideoTime: action("CHANGE_VIDEO_TIME", "newTime"),
       onDeleteKeyframe: action("DELETE_KEYFRAME", "time"),
       onChangeCurrentTime: action("CHANGE_VIDEO_TIME", "newTime"),
       currentTime: state.currentVideoTime,
       duration: state.videoDuration,
       keyframes: state.keyframes
-    }), React.createElement(HistorySidebarBox, {
-      key: "".concat(key, "_7"),
+    }), !hideRightSidebarSections.history && React.createElement(HistorySidebarBox, {
       history: state.history,
       onRestoreHistory: action("RESTORE_HISTORY")
-    })].filter(Boolean)
+    })], _toConsumableArray(rightSidebarInjectedSectionsBottom || [])).filter(Boolean)
   }, canvas), React.createElement(SettingsDialog, {
-    key: "".concat(key, "_8"),
     open: state.settingsOpen,
     onClose: function onClose() {
       return dispatch({

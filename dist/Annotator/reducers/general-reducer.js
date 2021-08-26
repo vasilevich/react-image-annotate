@@ -18,11 +18,20 @@ var getRandomId = function getRandomId() {
   return Math.random().toString().split(".")[1];
 };
 
-export default (function (state, action) {
+export default (function (state, action, readonly) {
   if (state.allowedArea && state.selectedTool !== "modify-allowed-area" && ["MOUSE_DOWN", "MOUSE_UP", "MOUSE_MOVE"].includes(action.type)) {
     var aa = state.allowedArea;
     action.x = clamp(action.x, aa.x, aa.x + aa.w);
     action.y = clamp(action.y, aa.y, aa.y + aa.h);
+  } else {// if(state.selectedImage!==undefined)
+    // {
+    //   const selectedImage = state.images && state.images[state.selectedImage]
+    //   if(selectedImage && selectedImage.pixelSize)
+    //   {
+    //     action.x = clamp(action.x, 0, selectedImage.pixelSize.w)
+    //     action.y = clamp(action.y, 0, selectedImage.pixelSize.h)
+    //   }
+    // }
   }
 
   if (action.type === "ON_CLS_ADDED" && action.cls && action.cls !== "") {
@@ -37,7 +46,7 @@ export default (function (state, action) {
 
 
   if (action.type === "MOUSE_MOVE") {
-    if (Date.now() - (state.lastMouseMoveCall || 0) < 16) return state;
+    if (Date.now() - (state.lastMouseMoveCall || 0) < 40) return state;
     state = setIn(state, ["lastMouseMoveCall"], Date.now());
   }
 
@@ -63,11 +72,19 @@ export default (function (state, action) {
     if (!activeImage) return null;
     var regionIndex = getRegionIndex(regionId);
     if (regionIndex === null) return [null, null];
-    var region = activeImage.regions[regionIndex];
+    var region = activeImage.regions[regionIndex]; // console.debug('GETREGION',{state,action,region,regionIndex})
+
     return [region, regionIndex];
   };
 
   var modifyRegion = function modifyRegion(regionId, obj) {
+    console.debug('MODREGION', {
+      state: state,
+      action: action,
+      regionId: regionId,
+      obj: obj
+    });
+
     var _getRegion = getRegion(regionId),
         _getRegion2 = _slicedToArray(_getRegion, 2),
         region = _getRegion2[0],
@@ -114,20 +131,25 @@ export default (function (state, action) {
     return setIn(setIn(state, ["selectedImage"], index), ["selectedImageFrameTime"], frameTime);
   };
 
+  var setReadOnly = function setReadOnly(val) {
+    return setIn(state, ["readOnly"], val);
+  };
+
   switch (action.type) {
     case "@@INIT":
       {
         return state;
       }
 
+    case "READONLY":
+      {
+        console.debug("dispatching readonly action", action);
+        return setReadOnly(action.val);
+      }
+
     case "SELECT_IMAGE":
       {
         return setNewImage(action.image, action.imageIndex);
-      }
-
-    case "SELECT_CLASSIFICATION":
-      {
-        return setIn(state, ["selectedCls"], action.cls);
       }
 
     case "CHANGE_REGION":
@@ -141,17 +163,12 @@ export default (function (state, action) {
           var clsIndex = state.regionClsList.indexOf(action.region.cls);
 
           if (clsIndex !== -1) {
-            state = setIn(state, ["selectedCls"], action.region.cls);
             action.region.color = colors[clsIndex % colors.length];
           }
         }
 
         if (!isEqual(oldRegion.tags, action.region.tags)) {
           state = saveToHistory(state, "Change Region Tags");
-        }
-
-        if (!isEqual(oldRegion.comment, action.region.comment)) {
-          state = saveToHistory(state, "Change Region Comment");
         }
 
         return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", regionIndex]), action.region);
@@ -182,8 +199,8 @@ export default (function (state, action) {
 
         var regions = _toConsumableArray(activeImage.regions || []).map(function (r) {
           return _objectSpread({}, r, {
-            highlighted: r.id === region.id,
-            editingLabels: r.id === region.id
+            highlighted: r.id === region.id && !r.highlighted,
+            editingLabels: r.id === region.id && !state.readOnly
           });
         });
 
@@ -380,11 +397,15 @@ export default (function (state, action) {
 
               if (_regionIndex6 === null) return state;
               var _box = activeImage.regions[_regionIndex6];
+              var nx = dx >= 0 && dx || 0;
+              var ny = dy >= 0 && dy || 0;
+              var nw = nx + dw > 1 && 1 - nx || dw;
+              var nh = ny + dh > 1 && 1 - ny || dh;
               return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex6]), _objectSpread({}, _box, {
-                x: dx,
-                w: dw,
-                y: dy,
-                h: dh
+                x: nx,
+                w: nw,
+                y: ny,
+                h: nh
               }));
             }
 
@@ -422,30 +443,14 @@ export default (function (state, action) {
               return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex7, "points", _region3.points.length - 1]), [x, y]);
             }
 
-          case "DRAW_LINE":
+          case "DRAW_EXPANDING_LINE":
             {
               var _regionId6 = state.mode.regionId;
 
               var _getRegion7 = getRegion(_regionId6),
                   _getRegion8 = _slicedToArray(_getRegion7, 2),
-                  _region4 = _getRegion8[0],
+                  expandingLine = _getRegion8[0],
                   _regionIndex8 = _getRegion8[1];
-
-              if (!_region4) return setIn(state, ["mode"], null);
-              return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex8]), _objectSpread({}, _region4, {
-                x2: x,
-                y2: y
-              }));
-            }
-
-          case "DRAW_EXPANDING_LINE":
-            {
-              var _regionId7 = state.mode.regionId;
-
-              var _getRegion9 = getRegion(_regionId7),
-                  _getRegion10 = _slicedToArray(_getRegion9, 2),
-                  expandingLine = _getRegion10[0],
-                  _regionIndex9 = _getRegion10[1];
 
               if (!expandingLine) return state;
               var isMouseDown = Boolean(state.mouseDownAt);
@@ -456,7 +461,7 @@ export default (function (state, action) {
                 var mouseDistFromLastPoint = Math.sqrt(Math.pow(lastPoint.x - x, 2) + Math.pow(lastPoint.y - y, 2));
                 if (mouseDistFromLastPoint < 0.002 && !lastPoint.width) return state;
 
-                var _newState = setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex9, "points"]), expandingLine.points.slice(0, -1).concat([_objectSpread({}, lastPoint, {
+                var _newState = setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex8, "points"]), expandingLine.points.slice(0, -1).concat([_objectSpread({}, lastPoint, {
                   width: mouseDistFromLastPoint * 2,
                   angle: Math.atan2(lastPoint.x - x, lastPoint.y - y)
                 })]));
@@ -464,7 +469,7 @@ export default (function (state, action) {
                 return _newState;
               } else {
                 // If mouse is up, move the next candidate point
-                return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex9]), _objectSpread({}, expandingLine, {
+                return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex8]), _objectSpread({}, expandingLine, {
                   candidatePoint: {
                     x: x,
                     y: y
@@ -477,12 +482,12 @@ export default (function (state, action) {
 
           case "SET_EXPANDING_LINE_WIDTH":
             {
-              var _regionId8 = state.mode.regionId;
+              var _regionId7 = state.mode.regionId;
 
-              var _getRegion11 = getRegion(_regionId8),
-                  _getRegion12 = _slicedToArray(_getRegion11, 2),
-                  _expandingLine = _getRegion12[0],
-                  _regionIndex10 = _getRegion12[1];
+              var _getRegion9 = getRegion(_regionId7),
+                  _getRegion10 = _slicedToArray(_getRegion9, 2),
+                  _expandingLine = _getRegion10[0],
+                  _regionIndex9 = _getRegion10[1];
 
               if (!_expandingLine) return state;
 
@@ -490,7 +495,7 @@ export default (function (state, action) {
 
               var _state3 = state,
                   _mouseDownAt = _state3.mouseDownAt;
-              return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex10, "expandingWidth"]), Math.sqrt(Math.pow(_lastPoint.x - x, 2) + Math.pow(_lastPoint.y - y, 2)));
+              return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex9, "expandingWidth"]), Math.sqrt(Math.pow(_lastPoint.x - x, 2) + Math.pow(_lastPoint.y - y, 2)));
             }
 
           default:
@@ -512,38 +517,23 @@ export default (function (state, action) {
           switch (state.mode.mode) {
             case "DRAW_POLYGON":
               {
-                var _getRegion13 = getRegion(state.mode.regionId),
-                    _getRegion14 = _slicedToArray(_getRegion13, 2),
-                    _polygon2 = _getRegion14[0],
-                    _regionIndex11 = _getRegion14[1];
+                var _getRegion11 = getRegion(state.mode.regionId),
+                    _getRegion12 = _slicedToArray(_getRegion11, 2),
+                    _polygon2 = _getRegion12[0],
+                    _regionIndex10 = _getRegion12[1];
 
                 if (!_polygon2) break;
-                return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex11]), _objectSpread({}, _polygon2, {
+                return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex10]), _objectSpread({}, _polygon2, {
                   points: _polygon2.points.concat([[_x, _y]])
                 }));
               }
 
-            case "DRAW_LINE":
-              {
-                var _getRegion15 = getRegion(state.mode.regionId),
-                    _getRegion16 = _slicedToArray(_getRegion15, 2),
-                    line = _getRegion16[0],
-                    _regionIndex12 = _getRegion16[1];
-
-                if (!line) break;
-                setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex12]), _objectSpread({}, line, {
-                  x2: _x,
-                  y2: _y
-                }));
-                return setIn(state, ["mode"], null);
-              }
-
             case "DRAW_EXPANDING_LINE":
               {
-                var _getRegion17 = getRegion(state.mode.regionId),
-                    _getRegion18 = _slicedToArray(_getRegion17, 2),
-                    _expandingLine2 = _getRegion18[0],
-                    _regionIndex13 = _getRegion18[1];
+                var _getRegion13 = getRegion(state.mode.regionId),
+                    _getRegion14 = _slicedToArray(_getRegion13, 2),
+                    _expandingLine2 = _getRegion14[0],
+                    _regionIndex11 = _getRegion14[1];
 
                 if (!_expandingLine2) break;
 
@@ -556,12 +546,12 @@ export default (function (state, action) {
                       regionId: state.mode.regionId
                     });
                   } else {
-                    return state.setIn([].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex13]), convertExpandingLineToPolygon(_expandingLine2)).setIn(["mode"], null);
+                    return state.setIn([].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex11]), convertExpandingLineToPolygon(_expandingLine2)).setIn(["mode"], null);
                   }
                 } // Create new point
 
 
-                return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex13, "points"]), _expandingLine2.points.concat([{
+                return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex11, "points"]), _expandingLine2.points.concat([{
                   x: _x,
                   y: _y,
                   angle: null,
@@ -571,14 +561,14 @@ export default (function (state, action) {
 
             case "SET_EXPANDING_LINE_WIDTH":
               {
-                var _getRegion19 = getRegion(state.mode.regionId),
-                    _getRegion20 = _slicedToArray(_getRegion19, 2),
-                    _expandingLine3 = _getRegion20[0],
-                    _regionIndex14 = _getRegion20[1];
+                var _getRegion15 = getRegion(state.mode.regionId),
+                    _getRegion16 = _slicedToArray(_getRegion15, 2),
+                    _expandingLine3 = _getRegion16[0],
+                    _regionIndex12 = _getRegion16[1];
 
                 if (!_expandingLine3) break;
                 var expandingWidth = _expandingLine3.expandingWidth;
-                return state.setIn([].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex14]), convertExpandingLineToPolygon(_objectSpread({}, _expandingLine3, {
+                return state.setIn([].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex12]), convertExpandingLineToPolygon(_objectSpread({}, _expandingLine3, {
                   points: _expandingLine3.points.map(function (p) {
                     return p.width ? p : _objectSpread({}, p, {
                       width: expandingWidth
@@ -594,13 +584,17 @@ export default (function (state, action) {
         }
 
         var newRegion;
-        var defaultRegionCls = state.selectedCls,
+        var defaultRegionCls = undefined,
             defaultRegionColor = "#ff0000";
 
-        var _clsIndex = (state.regionClsList || []).indexOf(defaultRegionCls);
+        if (activeImage && (activeImage.regions || []).length > 0) {
+          defaultRegionCls = activeImage.regions.slice(-1)[0].cls;
 
-        if (_clsIndex !== -1) {
-          defaultRegionColor = colors[_clsIndex % colors.length];
+          var _clsIndex = (state.regionClsList || []).indexOf(defaultRegionCls);
+
+          if (_clsIndex !== -1) {
+            defaultRegionColor = colors[_clsIndex % colors.length];
+          }
         }
 
         switch (state.selectedTool) {
@@ -691,29 +685,6 @@ export default (function (state, action) {
               };
               state = setIn(state, ["mode"], {
                 mode: "DRAW_EXPANDING_LINE",
-                regionId: newRegion.id
-              });
-              break;
-            }
-
-          case "create-line":
-            {
-              if (state.mode && state.mode.mode === "DRAW_LINE") break;
-              state = saveToHistory(state, "Create Line");
-              newRegion = {
-                type: "line",
-                x1: _x,
-                y1: _y,
-                x2: _x,
-                y2: _y,
-                highlighted: true,
-                editingLabels: false,
-                color: defaultRegionColor,
-                cls: defaultRegionCls,
-                id: getRandomId()
-              };
-              state = setIn(state, ["mode"], {
-                mode: "DRAW_LINE",
                 regionId: newRegion.id
               });
               break;
@@ -824,10 +795,10 @@ export default (function (state, action) {
 
           case "DRAW_EXPANDING_LINE":
             {
-              var _getRegion21 = getRegion(state.mode.regionId),
-                  _getRegion22 = _slicedToArray(_getRegion21, 2),
-                  _expandingLine4 = _getRegion22[0],
-                  _regionIndex15 = _getRegion22[1];
+              var _getRegion17 = getRegion(state.mode.regionId),
+                  _getRegion18 = _slicedToArray(_getRegion17, 2),
+                  _expandingLine4 = _getRegion18[0],
+                  _regionIndex13 = _getRegion18[1];
 
               if (!_expandingLine4) return state;
               var newExpandingLine = _expandingLine4;
@@ -860,7 +831,7 @@ export default (function (state, action) {
                 return state;
               }
 
-              return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex15]), newExpandingLine);
+              return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex13]), newExpandingLine);
             }
 
           default:
@@ -870,17 +841,17 @@ export default (function (state, action) {
 
     case "OPEN_REGION_EDITOR":
       {
-        var _region5 = action.region;
+        var _region4 = action.region;
 
-        var _regionIndex16 = getRegionIndex(action.region);
+        var _regionIndex14 = getRegionIndex(action.region);
 
-        if (_regionIndex16 === null) return state;
+        if (_regionIndex14 === null) return state;
         var newRegions = setIn(activeImage.regions.map(function (r) {
           return _objectSpread({}, r, {
             highlighted: false,
             editingLabels: false
           });
-        }), [_regionIndex16], _objectSpread({}, (activeImage.regions || [])[_regionIndex16], {
+        }), [_regionIndex14], _objectSpread({}, (activeImage.regions || [])[_regionIndex14], {
           highlighted: true,
           editingLabels: true
         }));
@@ -889,21 +860,21 @@ export default (function (state, action) {
 
     case "CLOSE_REGION_EDITOR":
       {
-        var _region6 = action.region;
+        var _region5 = action.region;
 
-        var _regionIndex17 = getRegionIndex(action.region);
+        var _regionIndex15 = getRegionIndex(action.region);
 
-        if (_regionIndex17 === null) return state;
-        return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex17]), _objectSpread({}, (activeImage.regions || [])[_regionIndex17], {
+        if (_regionIndex15 === null) return state;
+        return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions", _regionIndex15]), _objectSpread({}, (activeImage.regions || [])[_regionIndex15], {
           editingLabels: false
         }));
       }
 
     case "DELETE_REGION":
       {
-        var _regionIndex18 = getRegionIndex(action.region);
+        var _regionIndex16 = getRegionIndex(action.region);
 
-        if (_regionIndex18 === null) return state;
+        if (_regionIndex16 === null) return state;
         return setIn(state, [].concat(_toConsumableArray(pathToActiveImage), ["regions"]), (activeImage.regions || []).filter(function (r) {
           return r.id !== action.region.id;
         }));
@@ -1012,8 +983,8 @@ export default (function (state, action) {
             case "SET_EXPANDING_LINE_WIDTH":
             case "DRAW_POLYGON":
               {
-                var _regionId9 = mode.regionId;
-                return modifyRegion(_regionId9, null);
+                var _regionId8 = mode.regionId;
+                return modifyRegion(_regionId8, null);
               }
 
             case "MOVE_POLYGON_POINT":

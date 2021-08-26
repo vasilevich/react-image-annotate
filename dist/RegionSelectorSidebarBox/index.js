@@ -40,7 +40,8 @@ var Chip = function Chip(_ref) {
 };
 
 var RowLayout = function RowLayout(_ref2) {
-  var header = _ref2.header,
+  var region = _ref2.region,
+      header = _ref2.header,
       highlighted = _ref2.highlighted,
       order = _ref2.order,
       classification = _ref2.classification,
@@ -49,7 +50,8 @@ var RowLayout = function RowLayout(_ref2) {
       trash = _ref2.trash,
       lock = _ref2.lock,
       visible = _ref2.visible,
-      onClick = _ref2.onClick;
+      onClick = _ref2.onClick,
+      state = _ref2.state;
   var classes = useStyles();
 
   var _useState = useState(false),
@@ -57,6 +59,7 @@ var RowLayout = function RowLayout(_ref2) {
       mouseOver = _useState2[0],
       changeMouseOver = _useState2[1];
 
+  var ro = state.readOnly;
   return React.createElement("div", {
     onClick: onClick,
     onMouseEnter: function onMouseEnter() {
@@ -68,7 +71,10 @@ var RowLayout = function RowLayout(_ref2) {
     className: classnames(classes.row, {
       header: header,
       highlighted: highlighted
-    })
+    }),
+    style: ro && {
+      padding: '15pt 5pt 15pt 0pt'
+    } || {}
   }, React.createElement(Grid, {
     container: true,
     alignItems: "center"
@@ -94,66 +100,88 @@ var RowLayout = function RowLayout(_ref2) {
   }, area)), React.createElement(Grid, {
     item: true,
     xs: 1
-  }, trash), React.createElement(Grid, {
+  }, !ro && trash), React.createElement(Grid, {
     item: true,
     xs: 1
-  }, lock), React.createElement(Grid, {
+  }, !ro && lock), React.createElement(Grid, {
     item: true,
     xs: 1
   }, visible)));
 };
 
-var RowHeader = function RowHeader() {
+var RowHeader = function RowHeader(_ref3) {
+  var _ref3$regions = _ref3.regions,
+      regions = _ref3$regions === void 0 ? emptyArr : _ref3$regions,
+      onDeleteRegion = _ref3.onDeleteRegion,
+      onChangeRegion = _ref3.onChangeRegion,
+      onSelectRegion = _ref3.onSelectRegion,
+      state = _ref3.state;
+  var vis = React.useState(true);
   return React.createElement(RowLayout, {
     header: true,
+    state: state,
     highlighted: false,
-    order: React.createElement(ReorderIcon, {
-      className: "icon"
+    visible: React.createElement(VisibleIcon, {
+      className: "icon",
+      onClick: function onClick() {
+        regions.forEach(function (r) {
+          onChangeRegion(_objectSpread({}, r, {
+            visible: !vis[0]
+          }));
+        });
+        vis[1](!vis[0]);
+      }
     }),
     classification: React.createElement("div", {
       style: {
         paddingLeft: 10
       }
-    }, "Class"),
-    area: React.createElement(PieChartIcon, {
-      className: "icon"
-    }),
-    trash: React.createElement(TrashIcon, {
-      className: "icon"
-    }),
-    lock: React.createElement(LockIcon, {
-      className: "icon"
-    }),
-    visible: React.createElement(VisibleIcon, {
-      className: "icon"
-    })
-  });
+    }, "Class")
+  }) // <RowLayout
+  //   header
+  //   highlighted={false}
+  //   order={<ReorderIcon className="icon" />}
+  //   classification={<div style={{ paddingLeft: 10 }}>Class</div>}
+  //   area={<PieChartIcon className="icon" />}
+  //   trash={<TrashIcon className="icon" />}
+  //   lock={<LockIcon className="icon" />}
+  //   visible={<VisibleIcon className="icon" />}
+  // />
+  ;
 };
 
 var MemoRowHeader = memo(RowHeader);
 
-var Row = function Row(_ref3) {
-  var r = _ref3.region,
-      highlighted = _ref3.highlighted,
-      onSelectRegion = _ref3.onSelectRegion,
-      onDeleteRegion = _ref3.onDeleteRegion,
-      onChangeRegion = _ref3.onChangeRegion,
-      visible = _ref3.visible,
-      locked = _ref3.locked,
-      color = _ref3.color,
-      cls = _ref3.cls,
-      index = _ref3.index;
+var Row = function Row(_ref4) {
+  var r = _ref4.region,
+      highlighted = _ref4.highlighted,
+      onSelectRegion = _ref4.onSelectRegion,
+      onDeleteRegion = _ref4.onDeleteRegion,
+      onChangeRegion = _ref4.onChangeRegion,
+      visible = _ref4.visible,
+      locked = _ref4.locked,
+      color = _ref4.color,
+      cls = _ref4.cls,
+      index = _ref4.index,
+      state = _ref4.state;
   return React.createElement(RowLayout, {
     header: false,
+    region: r,
+    state: state,
     highlighted: highlighted,
-    onClick: function onClick() {
-      return onSelectRegion(r);
+    onClick: function onClick(e) {
+      console.debug("clickedRegionSelector", r);
+      onSelectRegion(r);
     },
     order: "#".concat(index + 1),
-    classification: React.createElement(Chip, {
+    classification: React.createElement("div", {
+      style: r && r.group && {
+        paddingLeft: '16pt'
+      } || {}
+    }, React.createElement(Chip, {
       text: cls || "",
       color: color || "#ddd"
-    }),
+    })),
     area: "",
     trash: React.createElement(TrashIcon, {
       onClick: function onClick() {
@@ -177,15 +205,20 @@ var Row = function Row(_ref3) {
       className: "icon2"
     }),
     visible: r.visible || r.visible === undefined ? React.createElement(VisibleIcon, {
-      onClick: function onClick() {
-        return onChangeRegion(_objectSpread({}, r, {
-          visible: false
+      onClick: function onClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        onChangeRegion(_objectSpread({}, r, {
+          visible: false,
+          highlighted: false
         }));
       },
       className: "icon2"
     }) : React.createElement(VisibleOffIcon, {
-      onClick: function onClick() {
-        return onChangeRegion(_objectSpread({}, r, {
+      onClick: function onClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        onChangeRegion(_objectSpread({}, r, {
           visible: true
         }));
       },
@@ -198,15 +231,17 @@ var MemoRow = memo(Row, function (prevProps, nextProps) {
   return prevProps.highlighted === nextProps.highlighted && prevProps.visible === nextProps.visible && prevProps.locked === nextProps.locked && prevProps.id === nextProps.id && prevProps.index === nextProps.index && prevProps.cls === nextProps.cls && prevProps.color === nextProps.color;
 });
 var emptyArr = [];
-export var RegionSelectorSidebarBox = function RegionSelectorSidebarBox(_ref4) {
-  var _ref4$regions = _ref4.regions,
-      regions = _ref4$regions === void 0 ? emptyArr : _ref4$regions,
-      onDeleteRegion = _ref4.onDeleteRegion,
-      onChangeRegion = _ref4.onChangeRegion,
-      onSelectRegion = _ref4.onSelectRegion;
+export var RegionSelectorSidebarBox = function RegionSelectorSidebarBox(_ref5) {
+  var _ref5$regions = _ref5.regions,
+      regions = _ref5$regions === void 0 ? emptyArr : _ref5$regions,
+      _onDeleteRegion = _ref5.onDeleteRegion,
+      onChangeRegion = _ref5.onChangeRegion,
+      onSelectRegion = _ref5.onSelectRegion,
+      state = _ref5.state;
   var classes = useStyles();
   return React.createElement(SidebarBoxContainer, {
     title: "Regions",
+    key: 'sidebarregionsbox',
     subTitle: "",
     icon: React.createElement(RegionIcon, {
       style: {
@@ -216,14 +251,25 @@ export var RegionSelectorSidebarBox = function RegionSelectorSidebarBox(_ref4) {
     expandedByDefault: true
   }, React.createElement("div", {
     className: classes.container
-  }, React.createElement(MemoRowHeader, null), React.createElement(HeaderSep, null), regions.map(function (r, i) {
+  }, React.createElement(MemoRowHeader, {
+    regions: regions,
+    onDeleteRegion: _onDeleteRegion,
+    onChangeRegion: onChangeRegion,
+    onSelectRegion: onSelectRegion,
+    state: state
+  }), React.createElement(HeaderSep, null), regions.map(function (r, i) {
     return React.createElement(MemoRow, Object.assign({
-      key: r.id
+      key: r.id || i
     }, r, {
       region: r,
+      state: state,
       index: i,
       onSelectRegion: onSelectRegion,
-      onDeleteRegion: onDeleteRegion,
+      onDeleteRegion: function onDeleteRegion() {
+        if (window.confirm('DELETE')) {
+          _onDeleteRegion.apply(void 0, arguments);
+        }
+      },
       onChangeRegion: onChangeRegion
     }));
   })));
