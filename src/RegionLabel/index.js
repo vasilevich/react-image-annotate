@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useRef, memo } from "react"
+import React, { useState, memo } from "react"
 import Paper from "@material-ui/core/Paper"
 import { makeStyles } from "@material-ui/core/styles"
 import styles from "./styles"
@@ -10,7 +10,7 @@ import IconButton from "@material-ui/core/IconButton"
 import Button from "@material-ui/core/Button"
 import TrashIcon from "@material-ui/icons/Delete"
 import CheckIcon from "@material-ui/icons/Check"
-import TextField from "@material-ui/core/TextField"
+import UndoIcon from "@material-ui/icons/Undo"
 import Select from "react-select"
 import CreatableSelect from "react-select/creatable"
 
@@ -30,7 +30,6 @@ type Props = {
   onClose: (Region) => null,
   onOpen: (Region) => null,
   onRegionClassAdded: () => {},
-  allowComments?: boolean,
 }
 
 export const RegionLabel = ({
@@ -43,16 +42,10 @@ export const RegionLabel = ({
   onClose,
   onOpen,
   onRegionClassAdded,
-  allowComments,
+  state
 }: Props) => {
   const classes = useStyles()
-  const commentInputRef = useRef(null)
-  const onCommentInputClick = (_) => {
-    // The TextField wraps the <input> tag with two divs
-    const commentInput = commentInputRef.current.children[0].children[0]
-
-    if (commentInput) return commentInput.focus()
-  }
+  const ro = state.readOnly;
 
   return (
     <Paper
@@ -61,7 +54,7 @@ export const RegionLabel = ({
         highlighted: region.highlighted,
       })}
     >
-      {!editing ? (
+      {(!editing || ro) ? (
         <div>
           {region.cls && (
             <div className="name">
@@ -84,8 +77,8 @@ export const RegionLabel = ({
         </div>
       ) : (
         <div style={{ width: 200 }}>
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            <div
+          {!ro && <div style={{ display: "flex", flexDirection: "row" }}>
+           {!ro && <div
               style={{
                 display: "flex",
                 backgroundColor: region.color || "#888",
@@ -99,9 +92,9 @@ export const RegionLabel = ({
               }}
             >
               {region.type}
-            </div>
+            </div>}
             <div style={{ flexGrow: 1 }} />
-            <IconButton
+            {!ro && <IconButton
               onClick={() => onDelete(region)}
               tabIndex={-1}
               style={{ width: 22, height: 22 }}
@@ -109,11 +102,11 @@ export const RegionLabel = ({
               variant="outlined"
             >
               <TrashIcon style={{ marginTop: -8, width: 16, height: 16 }} />
-            </IconButton>
-          </div>
+            </IconButton>}
+          </div>}
           {(allowedClasses || []).length > 0 && (
             <div style={{ marginTop: 6 }}>
-              <CreatableSelect
+              {!ro && <CreatableSelect
                 placeholder="Classification"
                 onChange={(o, actionMeta) => {
                   if (actionMeta.action == "create-option") {
@@ -130,16 +123,18 @@ export const RegionLabel = ({
                 options={asMutable(
                   allowedClasses.map((c) => ({ value: c, label: c }))
                 )}
-              />
+              /> || <div>
+                {region.cls}
+              </div>}
             </div>
           )}
           {(allowedTags || []).length > 0 && (
             <div style={{ marginTop: 4 }}>
-              <Select
+             {!ro && <Select
                 onChange={(newTags) =>
                   onChange({
                     ...(region: any),
-                    tags: newTags.map((t) => t.value),
+                    tags: newTags && newTags.map((t) => t.value) || [],
                   })
                 }
                 placeholder="Tags"
@@ -148,24 +143,10 @@ export const RegionLabel = ({
                 options={asMutable(
                   allowedTags.map((c) => ({ value: c, label: c }))
                 )}
-              />
+              /> || (region.tags || []).map(tag=>{
+              return <div key={tag} style={{padding:4}}>{tag}</div>
+              })}
             </div>
-          )}
-          {allowComments && (
-            <TextField
-              InputProps={{
-                className: classes.commentBox,
-              }}
-              fullWidth
-              multiline
-              rows={3}
-              ref={commentInputRef}
-              onClick={onCommentInputClick}
-              value={region.comment || ""}
-              onChange={(event) =>
-                onChange({ ...(region: any), comment: event.target.value })
-              }
-            />
           )}
           {onClose && (
             <div style={{ marginTop: 4, display: "flex" }}>

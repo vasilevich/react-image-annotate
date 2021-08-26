@@ -22,6 +22,9 @@ import historyHandler from "./reducers/history-handler.js"
 import useEventCallback from "use-event-callback"
 import makeImmutable, { without } from "seamless-immutable"
 import getFromLocalStorage from "../utils/get-from-local-storage"
+import { AnnotatorModule } from './moduleDispatcher'
+
+
 
 type Props = {
   taskDescription?: string,
@@ -66,10 +69,14 @@ export const Annotator = ({
     "create-point",
     "create-box",
     "create-polygon",
-    "create-line",
     "create-expanding-line",
     "show-mask",
   ],
+  hideRightSidebarSections={},
+  rightSidebarOnLeft=false,
+  rightSidebarInjectedSections=[],
+  rightSidebarInjectedSectionsBottom=[],
+  controlId='',
   selectedTool = "select",
   regionTagList = [],
   regionClsList = [],
@@ -79,6 +86,10 @@ export const Annotator = ({
   taskDescription = "",
   fullImageSegmentationMode = false,
   RegionEditLabel,
+  topBarOpts,
+  readOnly,
+  headerAddedItems,
+  headerSubSection,
   videoSrc,
   videoTime = 0,
   videoName,
@@ -91,7 +102,6 @@ export const Annotator = ({
   hideHeaderText,
   hideNext,
   hidePrev,
-  allowComments,
 }: Props) => {
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
@@ -121,13 +131,21 @@ export const Annotator = ({
       regionClsList,
       regionTagList,
       imageClsList,
+      hideRightSidebarSections,
+      topBarOpts,
+      readOnly,
+      headerSubSection,
+      headerAddedItems,
+      rightSidebarInjectedSections,
+      rightSidebarInjectedSectionsBottom,
+      controlId,
+      rightSidebarOnLeft,
       imageTagList,
       currentVideoTime: videoTime,
       enabledTools,
       history: [],
       videoName,
       keypointDefinitions,
-      allowComments,
       ...(annotationType === "image"
         ? {
             selectedImage,
@@ -155,6 +173,9 @@ export const Annotator = ({
     dispatchToReducer(action)
   })
 
+
+  AnnotatorModule.dispatch=dispatch;
+  
   const onRegionClassAdded = useEventCallback((cls) => {
     dispatchToReducer({
       type: "ON_CLS_ADDED",
@@ -181,6 +202,15 @@ export const Annotator = ({
         alwaysShowNextButton={Boolean(onNextImage)}
         alwaysShowPrevButton={Boolean(onPrevImage)}
         state={state}
+        rightSidebarOnLeft={rightSidebarOnLeft}
+        hideRightSidebarSections={hideRightSidebarSections}
+        rightSidebarInjectedSections={rightSidebarInjectedSections}
+        rightSidebarInjectedSectionsBottom={rightSidebarInjectedSectionsBottom}
+        controlId={controlId}
+        headerSubSection={headerSubSection}
+        readOnly={readOnly}
+        topBarOpts={topBarOpts}
+        headerAddedItems={headerAddedItems}
         dispatch={dispatch}
         onRegionClassAdded={onRegionClassAdded}
         hideHeader={hideHeader}

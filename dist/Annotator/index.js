@@ -11,6 +11,7 @@ import historyHandler from "./reducers/history-handler.js";
 import useEventCallback from "use-event-callback";
 import makeImmutable, { without } from "seamless-immutable";
 import getFromLocalStorage from "../utils/get-from-local-storage";
+import { AnnotatorModule } from './moduleDispatcher';
 export var Annotator = function Annotator(_ref) {
   var images = _ref.images,
       allowedArea = _ref.allowedArea,
@@ -21,7 +22,17 @@ export var Annotator = function Annotator(_ref) {
       _ref$showTags = _ref.showTags,
       showTags = _ref$showTags === void 0 ? getFromLocalStorage("showTags", true) : _ref$showTags,
       _ref$enabledTools = _ref.enabledTools,
-      enabledTools = _ref$enabledTools === void 0 ? ["select", "create-point", "create-box", "create-polygon", "create-line", "create-expanding-line", "show-mask"] : _ref$enabledTools,
+      enabledTools = _ref$enabledTools === void 0 ? ["select", "create-point", "create-box", "create-polygon", "create-expanding-line", "show-mask"] : _ref$enabledTools,
+      _ref$hideRightSidebar = _ref.hideRightSidebarSections,
+      hideRightSidebarSections = _ref$hideRightSidebar === void 0 ? {} : _ref$hideRightSidebar,
+      _ref$rightSidebarOnLe = _ref.rightSidebarOnLeft,
+      rightSidebarOnLeft = _ref$rightSidebarOnLe === void 0 ? false : _ref$rightSidebarOnLe,
+      _ref$rightSidebarInje = _ref.rightSidebarInjectedSections,
+      rightSidebarInjectedSections = _ref$rightSidebarInje === void 0 ? [] : _ref$rightSidebarInje,
+      _ref$rightSidebarInje2 = _ref.rightSidebarInjectedSectionsBottom,
+      rightSidebarInjectedSectionsBottom = _ref$rightSidebarInje2 === void 0 ? [] : _ref$rightSidebarInje2,
+      _ref$controlId = _ref.controlId,
+      controlId = _ref$controlId === void 0 ? '' : _ref$controlId,
       _ref$selectedTool = _ref.selectedTool,
       selectedTool = _ref$selectedTool === void 0 ? "select" : _ref$selectedTool,
       _ref$regionTagList = _ref.regionTagList,
@@ -39,6 +50,10 @@ export var Annotator = function Annotator(_ref) {
       _ref$fullImageSegment = _ref.fullImageSegmentationMode,
       fullImageSegmentationMode = _ref$fullImageSegment === void 0 ? false : _ref$fullImageSegment,
       RegionEditLabel = _ref.RegionEditLabel,
+      topBarOpts = _ref.topBarOpts,
+      readOnly = _ref.readOnly,
+      headerAddedItems = _ref.headerAddedItems,
+      headerSubSection = _ref.headerSubSection,
       videoSrc = _ref.videoSrc,
       _ref$videoTime = _ref.videoTime,
       videoTime = _ref$videoTime === void 0 ? 0 : _ref$videoTime,
@@ -54,8 +69,7 @@ export var Annotator = function Annotator(_ref) {
       hideHeader = _ref.hideHeader,
       hideHeaderText = _ref.hideHeaderText,
       hideNext = _ref.hideNext,
-      hidePrev = _ref.hidePrev,
-      allowComments = _ref.allowComments;
+      hidePrev = _ref.hidePrev;
 
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex(function (img) {
@@ -82,13 +96,21 @@ export var Annotator = function Annotator(_ref) {
     regionClsList: regionClsList,
     regionTagList: regionTagList,
     imageClsList: imageClsList,
+    hideRightSidebarSections: hideRightSidebarSections,
+    topBarOpts: topBarOpts,
+    readOnly: readOnly,
+    headerSubSection: headerSubSection,
+    headerAddedItems: headerAddedItems,
+    rightSidebarInjectedSections: rightSidebarInjectedSections,
+    rightSidebarInjectedSectionsBottom: rightSidebarInjectedSectionsBottom,
+    controlId: controlId,
+    rightSidebarOnLeft: rightSidebarOnLeft,
     imageTagList: imageTagList,
     currentVideoTime: videoTime,
     enabledTools: enabledTools,
     history: [],
     videoName: videoName,
-    keypointDefinitions: keypointDefinitions,
-    allowComments: allowComments
+    keypointDefinitions: keypointDefinitions
   }, annotationType === "image" ? {
     selectedImage: selectedImage,
     images: images,
@@ -114,6 +136,7 @@ export var Annotator = function Annotator(_ref) {
 
     dispatchToReducer(action);
   });
+  AnnotatorModule.dispatch = dispatch;
   var onRegionClassAdded = useEventCallback(function (cls) {
     dispatchToReducer({
       type: "ON_CLS_ADDED",
@@ -134,6 +157,15 @@ export var Annotator = function Annotator(_ref) {
     alwaysShowNextButton: Boolean(onNextImage),
     alwaysShowPrevButton: Boolean(onPrevImage),
     state: state,
+    rightSidebarOnLeft: rightSidebarOnLeft,
+    hideRightSidebarSections: hideRightSidebarSections,
+    rightSidebarInjectedSections: rightSidebarInjectedSections,
+    rightSidebarInjectedSectionsBottom: rightSidebarInjectedSectionsBottom,
+    controlId: controlId,
+    headerSubSection: headerSubSection,
+    readOnly: readOnly,
+    topBarOpts: topBarOpts,
+    headerAddedItems: headerAddedItems,
     dispatch: dispatch,
     onRegionClassAdded: onRegionClassAdded,
     hideHeader: hideHeader,

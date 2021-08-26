@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useMemo, useState } from "react";
 import { styled } from "@material-ui/core/styles";
 import useEventCallback from "use-event-callback";
 import { useSettings } from "../SettingsProvider";
+import { GetInjectedImageState } from "../Annotator/moduleDispatcher";
 var Video = styled("video")({
   zIndex: 0,
   position: "absolute"
@@ -25,7 +26,8 @@ var Error = styled("div")({
   padding: 50
 });
 export default (function (_ref) {
-  var imagePosition = _ref.imagePosition,
+  var state = _ref.state,
+      imagePosition = _ref.imagePosition,
       mouseEvents = _ref.mouseEvents,
       videoTime = _ref.videoTime,
       videoSrc = _ref.videoSrc,
@@ -107,7 +109,7 @@ export default (function (_ref) {
     });
   });
   var onImageError = useEventCallback(function (event) {
-    setError("Could not load image\n\nMake sure your image works by visiting ".concat(imageSrc || videoSrc, " in a web browser. If that URL works, the server hosting the URL may be not allowing you to access the image from your current domain. Adjust server settings to enable the image to be viewed.").concat(!useCrossOrigin ? "" : "\n\nYour image may be blocked because it's not being sent with CORs headers. To do pixel segmentation, browser web security requires CORs headers in order for the algorithm to read the pixel data from the image. CORs headers are easy to add if you're using an S3 bucket or own the server hosting your images.", "\n\n If you need a hand, reach out to the community at universaldatatool.slack.com"));
+    setError("!\n\n".concat(imageSrc || videoSrc));
   });
   var stylePosition = useMemo(function () {
     var width = imagePosition.bottomRight.x - imagePosition.topLeft.x;
@@ -120,19 +122,22 @@ export default (function (_ref) {
       height: isNaN(height) ? 0 : height
     };
   }, [imagePosition.topLeft.x, imagePosition.topLeft.y, imagePosition.bottomRight.x, imagePosition.bottomRight.y]);
-  if (!videoSrc && !imageSrc) return React.createElement(Error, null, "No imageSrc or videoSrc provided");
+  var injectedCanvas = GetInjectedImageState(state, imageSrc || videoSrc || '');
+  if (!videoSrc && !imageSrc && !injectedCanvas) return React.createElement(Error, null, "No imageSrc or videoSrc provided");
   if (error) return React.createElement(Error, null, error);
-  return imageSrc && videoTime === undefined ? React.createElement(StyledImage, Object.assign({}, mouseEvents, {
+  return React.createElement(React.Fragment, null, injectedCanvas && !!injectedCanvas.CanvasWrapper && React.createElement(injectedCanvas.CanvasWrapper, Object.assign({}, injectedCanvas.props, {
+    style: stylePosition
+  })) || imageSrc && videoTime === undefined && React.createElement(StyledImage, Object.assign({}, mouseEvents, {
     src: imageSrc,
     ref: imageRef,
     style: stylePosition,
     onLoad: onImageLoaded,
     onError: onImageError,
     crossOrigin: useCrossOrigin ? "anonymous" : undefined
-  })) : React.createElement(Video, Object.assign({}, mouseEvents, {
+  })) || (imageSrc || videoSrc) && React.createElement(Video, Object.assign({}, mouseEvents, {
     ref: videoRef,
     style: stylePosition,
     onLoadedMetadata: onLoadedVideoMetadata,
     src: videoSrc || imageSrc
-  }));
+  })), ")");
 });

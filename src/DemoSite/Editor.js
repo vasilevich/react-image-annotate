@@ -59,7 +59,6 @@ export const examples = {
         name: "bianchi-oltre-xr4",
       },
     ],
-    allowComments: true,
   }),
   "Simple Segmentation": () => ({
     taskDescription:
@@ -180,7 +179,7 @@ const Editor = ({ onOpenAnnotator, lastOutput }: any) => {
   imageTagList?: Array<string>,
   imageClsList?: Array<string>,
   // all tools are enabled by default
-  enabledTools?: Array< "select" | "create-point" | "create-box" | "create-polygon" | "create-line">,
+  enabledTools?: Array< "select" | "create-point" | "create-box" | "create-polygon">,
   selectedImage?: string, // initial selected image
   images: Array<{
     src: string,

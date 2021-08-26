@@ -54,20 +54,19 @@ export default (function (expandingLine) {
     open: false,
     points: newPoints,
     unfinished: undefined,
-    candidatePoint: undefined // let { expandingWidth = 0.005, points } = region
-    // expandingWidth = points.slice(-1)[0].width || expandingWidth
-    // const lastPoint = points.slice(-1)[0]
-    // return (
-    //   <>
-    //     <polygon
-    //       points={
-    //         .map((p) => `${p.x * iw} ${p.y * ih}`)
-    //         .join(" ")}
-    // return {
-    //   ...expandingLine,
-    //   unfinished: undefined,
-    //   candidatePoint: undefined,
-    // }
-
-  });
+    candidatePoint: undefined
+  }); // let { expandingWidth = 0.005, points } = region
+  // expandingWidth = points.slice(-1)[0].width || expandingWidth
+  // const lastPoint = points.slice(-1)[0]
+  // return (
+  //   <>
+  //     <polygon
+  //       points={
+  //         .map((p) => `${p.x * iw} ${p.y * ih}`)
+  //         .join(" ")}
+  // return {
+  //   ...expandingLine,
+  //   unfinished: undefined,
+  //   candidatePoint: undefined,
+  // }
 });

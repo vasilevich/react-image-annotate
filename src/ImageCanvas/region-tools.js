@@ -48,16 +48,6 @@ export type Polygon = {|
   open?: boolean,
   points: Array<[number, number]>,
 |}
-
-export type Line = {|
-  ...$Exact<BaseRegion>,
-  type: "line",
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-|}
-
 export type ExpandingLine = {|
   ...$Exact<BaseRegion>,
   type: "expanding-line",
@@ -111,6 +101,20 @@ export const getEnclosingBox = (region: Region) => {
       box.h = Math.max(...region.points.map(([x, y]) => y)) - box.y
       return box
     }
+    case "geometry": {
+      const box = {
+        x: region.coordinates &&  region.coordinates[0] && Math.min(...region.coordinates[0].map(([x, y]) => x)) || 0,
+        y: region.coordinates &&  region.coordinates[0] && Math.min(...region.coordinates[0].map(([x, y]) => y)) || 0,
+        w: 0,
+        h: 0,
+      }
+      if(region.coordinates &&  region.coordinates[0])
+      {
+        box.w = Math.max(...region.coordinates[0].map(([x, y]) => x)) - box.x
+        box.h = Math.max(...region.coordinates[0].map(([x, y]) => y)) - box.y
+      }    
+      return box
+    }
     case "keypoints": {
       const minX = Math.min(
         ...Object.values(region.points).map(({ x, y }) => x)
@@ -142,9 +146,6 @@ export const getEnclosingBox = (region: Region) => {
       box.h = Math.max(...region.points.map(({ x, y }) => y)) - box.y
       return box
     }
-    case "line": {
-      return { x: region.x1, y: region.y1, w: 0, h: 0 }
-    }
     case "box": {
       return { x: region.x, y: region.y, w: region.w, h: region.h }
     }
@@ -159,6 +160,40 @@ export const getEnclosingBox = (region: Region) => {
 }
 
 export const moveRegion = (region: Region, x: number, y: number) => {
+  if(x<0)
+  {
+    x=0
+  }
+  if(x>1)
+  {
+    x=1
+  }
+  if(y<0)
+  {
+    y=0
+  }
+  if(y>1)
+  {
+    y=1
+  }
+  const halfw=region.w/2
+  if(x - halfw < 0)
+  {
+    x = halfw
+  }
+  if(x+halfw>1)
+  {
+    x=1-halfw
+  }
+  const halfh=region.h/2
+  if(y - halfh < 0)
+  {
+    y = halfh
+  }
+  if(y+halfh>1)
+  {
+    y=1-halfh
+  }
   switch (region.type) {
     case "point": {
       return { ...region, x, y }

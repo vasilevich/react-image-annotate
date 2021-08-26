@@ -15,7 +15,7 @@ import setInLocalStorage from "../../utils/set-in-local-storage"
 
 const getRandomId = () => Math.random().toString().split(".")[1]
 
-export default (state: MainLayoutState, action: Action) => {
+export default (state: MainLayoutState, action: Action, readonly) => {
   if (
     state.allowedArea &&
     state.selectedTool !== "modify-allowed-area" &&
@@ -24,6 +24,16 @@ export default (state: MainLayoutState, action: Action) => {
     const aa = state.allowedArea
     action.x = clamp(action.x, aa.x, aa.x + aa.w)
     action.y = clamp(action.y, aa.y, aa.y + aa.h)
+  }else{
+    // if(state.selectedImage!==undefined)
+    // {
+    //   const selectedImage = state.images && state.images[state.selectedImage]
+    //   if(selectedImage && selectedImage.pixelSize)
+    //   {
+    //     action.x = clamp(action.x, 0, selectedImage.pixelSize.w)
+    //     action.y = clamp(action.y, 0, selectedImage.pixelSize.h)
+    //   }
+    // }
   }
 
   if (action.type === "ON_CLS_ADDED" && action.cls && action.cls !== "") {
@@ -37,7 +47,7 @@ export default (state: MainLayoutState, action: Action) => {
 
   // Throttle certain actions
   if (action.type === "MOUSE_MOVE") {
-    if (Date.now() - ((state: any).lastMouseMoveCall || 0) < 16) return state
+    if (Date.now() - ((state: any).lastMouseMoveCall || 0) < 40) return state
     state = setIn(state, ["lastMouseMoveCall"], Date.now())
   }
   if (!action.type.includes("MOUSE")) {
@@ -64,9 +74,11 @@ export default (state: MainLayoutState, action: Action) => {
     const regionIndex = getRegionIndex(regionId)
     if (regionIndex === null) return [null, null]
     const region = activeImage.regions[regionIndex]
+   // console.debug('GETREGION',{state,action,region,regionIndex})
     return [region, regionIndex]
   }
   const modifyRegion = (regionId, obj) => {
+    console.debug('MODREGION',{state,action,regionId,obj})
     const [region, regionIndex] = getRegion(regionId)
     if (!region) return state
     if (obj !== null) {
@@ -117,15 +129,22 @@ export default (state: MainLayoutState, action: Action) => {
     )
   }
 
+  const setReadOnly = (val:Boolean) => {
+    return setIn(
+      state,["readOnly"],val
+    )
+  }
+
   switch (action.type) {
     case "@@INIT": {
       return state
     }
+    case "READONLY": {
+      console.debug(`dispatching readonly action`,action)
+      return setReadOnly(action.val)
+    }
     case "SELECT_IMAGE": {
       return setNewImage(action.image, action.imageIndex)
-    }
-    case "SELECT_CLASSIFICATION": {
-      return setIn(state, ["selectedCls"], action.cls)
     }
     case "CHANGE_REGION": {
       const regionIndex = getRegionIndex(action.region)
@@ -135,15 +154,11 @@ export default (state: MainLayoutState, action: Action) => {
         state = saveToHistory(state, "Change Region Classification")
         const clsIndex = state.regionClsList.indexOf(action.region.cls)
         if (clsIndex !== -1) {
-          state = setIn(state, ["selectedCls"], action.region.cls)
           action.region.color = colors[clsIndex % colors.length]
         }
       }
       if (!isEqual(oldRegion.tags, action.region.tags)) {
         state = saveToHistory(state, "Change Region Tags")
-      }
-      if (!isEqual(oldRegion.comment, action.region.comment)) {
-        state = saveToHistory(state, "Change Region Comment")
       }
       return setIn(
         state,
@@ -167,8 +182,8 @@ export default (state: MainLayoutState, action: Action) => {
       if (regionIndex === null) return state
       const regions = [...(activeImage.regions || [])].map((r) => ({
         ...r,
-        highlighted: r.id === region.id,
-        editingLabels: r.id === region.id,
+        highlighted: r.id === region.id && !r.highlighted,
+        editingLabels: r.id === region.id && !state.readOnly,
       }))
       return setIn(state, [...pathToActiveImage, "regions"], regions)
     }
@@ -342,12 +357,16 @@ export default (state: MainLayoutState, action: Action) => {
           if (regionIndex === null) return state
           const box = activeImage.regions[regionIndex]
 
+          const nx = dx>=0 && dx || 0
+          const ny = dy>=0 && dy || 0
+          const nw = nx+dw>1 && (1-nx) || dw
+          const nh = ny+dh>1 && (1-ny) || dh
           return setIn(state, [...pathToActiveImage, "regions", regionIndex], {
             ...box,
-            x: dx,
-            w: dw,
-            y: dy,
-            h: dh,
+            x: nx,
+            w: nw,
+            y: ny,
+            h: nh,
           })
         }
         case "RESIZE_KEYPOINTS": {
@@ -379,16 +398,6 @@ export default (state: MainLayoutState, action: Action) => {
             ],
             [x, y]
           )
-        }
-        case "DRAW_LINE": {
-          const { regionId } = state.mode
-          const [region, regionIndex] = getRegion(regionId)
-          if (!region) return setIn(state, ["mode"], null)
-          return setIn(state, [...pathToActiveImage, "regions", regionIndex], {
-            ...region,
-            x2: x,
-            y2: y,
-          })
         }
         case "DRAW_EXPANDING_LINE": {
           const { regionId } = state.mode
@@ -462,16 +471,6 @@ export default (state: MainLayoutState, action: Action) => {
               { ...polygon, points: polygon.points.concat([[x, y]]) }
             )
           }
-          case "DRAW_LINE": {
-            const [line, regionIndex] = getRegion(state.mode.regionId)
-            if (!line) break
-            setIn(state, [...pathToActiveImage, "regions", regionIndex], {
-              ...line,
-              x2: x,
-              y2: y,
-            })
-            return setIn(state, ["mode"], null)
-          }
           case "DRAW_EXPANDING_LINE": {
             const [expandingLine, regionIndex] = getRegion(state.mode.regionId)
             if (!expandingLine) break
@@ -525,12 +524,14 @@ export default (state: MainLayoutState, action: Action) => {
       }
 
       let newRegion
-      let defaultRegionCls = state.selectedCls,
+      let defaultRegionCls = undefined,
         defaultRegionColor = "#ff0000"
-
-      const clsIndex = (state.regionClsList || []).indexOf(defaultRegionCls)
-      if (clsIndex !== -1) {
-        defaultRegionColor = colors[clsIndex % colors.length]
+      if (activeImage && (activeImage.regions || []).length > 0) {
+        defaultRegionCls = activeImage.regions.slice(-1)[0].cls
+        const clsIndex = (state.regionClsList || []).indexOf(defaultRegionCls)
+        if (clsIndex !== -1) {
+          defaultRegionColor = colors[clsIndex % colors.length]
+        }
       }
 
       switch (state.selectedTool) {
@@ -607,27 +608,6 @@ export default (state: MainLayoutState, action: Action) => {
           }
           state = setIn(state, ["mode"], {
             mode: "DRAW_EXPANDING_LINE",
-            regionId: newRegion.id,
-          })
-          break
-        }
-        case "create-line": {
-          if (state.mode && state.mode.mode === "DRAW_LINE") break
-          state = saveToHistory(state, "Create Line")
-          newRegion = {
-            type: "line",
-            x1: x,
-            y1: y,
-            x2: x,
-            y2: y,
-            highlighted: true,
-            editingLabels: false,
-            color: defaultRegionColor,
-            cls: defaultRegionCls,
-            id: getRandomId(),
-          }
-          state = setIn(state, ["mode"], {
-            mode: "DRAW_LINE",
             regionId: newRegion.id,
           })
           break

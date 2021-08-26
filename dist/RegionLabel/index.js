@@ -1,5 +1,5 @@
 import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
-import React, { useRef, memo } from "react";
+import React, { useState, memo } from "react";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import styles from "./styles";
@@ -8,7 +8,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import TrashIcon from "@material-ui/icons/Delete";
 import CheckIcon from "@material-ui/icons/Check";
-import TextField from "@material-ui/core/TextField";
+import UndoIcon from "@material-ui/icons/Undo";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { asMutable } from "seamless-immutable";
@@ -23,16 +23,9 @@ export var RegionLabel = function RegionLabel(_ref) {
       onClose = _ref.onClose,
       onOpen = _ref.onOpen,
       onRegionClassAdded = _ref.onRegionClassAdded,
-      allowComments = _ref.allowComments;
+      state = _ref.state;
   var classes = useStyles();
-  var commentInputRef = useRef(null);
-
-  var onCommentInputClick = function onCommentInputClick(_) {
-    // The TextField wraps the <input> tag with two divs
-    var commentInput = commentInputRef.current.children[0].children[0];
-    if (commentInput) return commentInput.focus();
-  };
-
+  var ro = state.readOnly;
   return React.createElement(Paper, {
     onClick: function onClick() {
       return !editing ? onOpen(region) : null;
@@ -40,7 +33,7 @@ export var RegionLabel = function RegionLabel(_ref) {
     className: classnames(classes.regionInfo, {
       highlighted: region.highlighted
     })
-  }, !editing ? React.createElement("div", null, region.cls && React.createElement("div", {
+  }, !editing || ro ? React.createElement("div", null, region.cls && React.createElement("div", {
     className: "name"
   }, React.createElement("div", {
     className: "circle",
@@ -58,12 +51,12 @@ export var RegionLabel = function RegionLabel(_ref) {
     style: {
       width: 200
     }
-  }, React.createElement("div", {
+  }, !ro && React.createElement("div", {
     style: {
       display: "flex",
       flexDirection: "row"
     }
-  }, React.createElement("div", {
+  }, !ro && React.createElement("div", {
     style: {
       display: "flex",
       backgroundColor: region.color || "#888",
@@ -79,7 +72,7 @@ export var RegionLabel = function RegionLabel(_ref) {
     style: {
       flexGrow: 1
     }
-  }), React.createElement(IconButton, {
+  }), !ro && React.createElement(IconButton, {
     onClick: function onClick() {
       return onDelete(region);
     },
@@ -100,7 +93,7 @@ export var RegionLabel = function RegionLabel(_ref) {
     style: {
       marginTop: 6
     }
-  }, React.createElement(CreatableSelect, {
+  }, !ro && React.createElement(CreatableSelect, {
     placeholder: "Classification",
     onChange: function onChange(o, actionMeta) {
       if (actionMeta.action == "create-option") {
@@ -121,16 +114,16 @@ export var RegionLabel = function RegionLabel(_ref) {
         label: c
       };
     }))
-  })), (allowedTags || []).length > 0 && React.createElement("div", {
+  }) || React.createElement("div", null, region.cls)), (allowedTags || []).length > 0 && React.createElement("div", {
     style: {
       marginTop: 4
     }
-  }, React.createElement(Select, {
+  }, !ro && React.createElement(Select, {
     onChange: function onChange(newTags) {
       return _onChange(_objectSpread({}, region, {
-        tags: newTags.map(function (t) {
+        tags: newTags && newTags.map(function (t) {
           return t.value;
-        })
+        }) || []
       }));
     },
     placeholder: "Tags",
@@ -147,22 +140,14 @@ export var RegionLabel = function RegionLabel(_ref) {
         label: c
       };
     }))
-  })), allowComments && React.createElement(TextField, {
-    InputProps: {
-      className: classes.commentBox
-    },
-    fullWidth: true,
-    multiline: true,
-    rows: 3,
-    ref: commentInputRef,
-    onClick: onCommentInputClick,
-    value: region.comment || "",
-    onChange: function onChange(event) {
-      return _onChange(_objectSpread({}, region, {
-        comment: event.target.value
-      }));
-    }
-  }), onClose && React.createElement("div", {
+  }) || (region.tags || []).map(function (tag) {
+    return React.createElement("div", {
+      key: tag,
+      style: {
+        padding: 4
+      }
+    }, tag);
+  })), onClose && React.createElement("div", {
     style: {
       marginTop: 4,
       display: "flex"

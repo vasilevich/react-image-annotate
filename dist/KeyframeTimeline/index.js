@@ -93,16 +93,35 @@ var min = 60000;
 var displayIntervalPairs = [[50, 250], [100, 500], [250, 1000], [1000, 5000], [5000, 30000], [10000, min], [30000, min * 2], [min, min * 5], [min * 5, min * 30], [min * 10, min * 60], [min * 30, min * 60 * 3], [min * 60, min * 60 * 5]];
 
 var getMajorInterval = function getMajorInterval(duration) {
-  for (var _i = 0, _displayIntervalPairs = displayIntervalPairs; _i < _displayIntervalPairs.length; _i++) {
-    var _ref3 = _displayIntervalPairs[_i];
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
 
-    var _ref2 = _slicedToArray(_ref3, 2);
+  try {
+    for (var _iterator = displayIntervalPairs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var _ref3 = _step.value;
 
-    var minor = _ref2[0];
-    var major = _ref2[1];
+      var _ref2 = _slicedToArray(_ref3, 2);
 
-    if (duration / major < 6 && duration / major > 2) {
-      return [minor, major];
+      var minor = _ref2[0];
+      var major = _ref2[1];
+
+      if (duration / major < 6 && duration / major > 2) {
+        return [minor, major];
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return != null) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
     }
   }
 

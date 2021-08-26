@@ -18,20 +18,12 @@ const RegionComponents = {
       />
     </g>
   )),
-  line: memo(({ region, iw, ih }) => (
-    <g transform={`translate(${region.x1 * iw} ${region.y1 * ih})`}>
-      <line
-        strokeWidth={2}
-        x1={0}
-        y1={0}
-        x2={(region.x2 - region.x1) * iw}
-        y2={(region.y2 - region.y1) * ih}
-        stroke={colorAlpha(region.color, 0.75)}
-        fill={colorAlpha(region.color, 0.25)}
-      />
-    </g>
-  )),
-  box: memo(({ region, iw, ih }) => (
+  box: memo(({ region, iw, ih }) => {
+    const point0 = [region.x,region.y]
+    return (
+    <>
+     {region.text && point0 &&  <text x={point0[0] * iw} y={point0[1] * ih} style={{fontWeight:'bold',
+     background:'#77777722', padding:3,fontSize:region.highlighted && '23pt' || '14pt'}} fill={region.color}>{region.text}</text>}
     <g transform={`translate(${region.x * iw} ${region.y * ih})`}>
       <rect
         strokeWidth={2}
@@ -39,25 +31,44 @@ const RegionComponents = {
         y={0}
         width={Math.max(region.w * iw, 0)}
         height={Math.max(region.h * ih, 0)}
-        stroke={colorAlpha(region.color, 0.75)}
-        fill={colorAlpha(region.color, 0.25)}
+        stroke={colorAlpha(region.color, region.highlighted && 1 || 0.75)}
+        fill={colorAlpha(region.color, region.highlighted && 0.4 || 0.25)}
       />
-    </g>
-  )),
+    </g></>
+  )}),
+  geometry:  memo(({ region, iw, ih }) => {
+    const point0 = region.geometry?.coordinates && region.geometry.coordinates[0] && region.geometry.coordinates[0][0] 
+    return (
+      region.geometry && region.geometry.coordinates && <>
+        {region.text && point0 &&  <text x={point0[0] * iw} y={point0[1] * ih} style={{fontWeight:'bold',
+        background:'#77777722', padding:3,fontSize:region.highlighted && '23pt' || '14pt'}} fill={region.color}>{region.text}</text>}
+       <path fill={colorAlpha(region.color, region.highlighted && 0.6 || 0.37)} fillRule="evenodd"
+       d={ region.geometry.coordinates.map(coords=>{
+        return  `M ${coords.map(coord=>`${coord[0]*iw} ${coord[1] * ih}`).join(" ")} Z`
+      }).join(" ")  } /> 
+      </>
+    )
+  }),
   polygon: memo(({ region, iw, ih, fullSegmentationMode }) => {
     const Component = region.open ? "polyline" : "polygon"
     const alphaBase = fullSegmentationMode ? 0.5 : 1
-
+    const point0 = region.points && region.points[0] 
+    
     return (
+      <>
+      {region.text && point0 &&  <text x={point0[0] * iw} y={point0[1] * ih} style={{fontWeight:'bold',
+      background:'#77777722', padding:3,
+      fontSize:region.highlighted && '23pt' || '14pt'}} fill={region.color}>{region.text}</text>}
       <Component
         points={region.points
           .map(([x, y]) => [x * iw, y * ih])
           .map((a) => a.join(" "))
           .join(" ")}
         strokeWidth={2}
-        stroke={colorAlpha(region.color, 0.75)}
-        fill={colorAlpha(region.color, 0.25)}
+        stroke={colorAlpha(region.color,region.highlighted && 1 || 0.75)}
+        fill={colorAlpha(region.color,region.highlighted && 0.5  || 0.25)}
       />
+      </>
     )
   }),
   keypoints: ({ region, iw, ih, keypointDefinitions }) => {
@@ -181,7 +192,7 @@ const RegionComponents = {
 export const WrappedRegionList = memo(
   ({ regions, keypointDefinitions, iw, ih, fullSegmentationMode }) => {
     return regions
-      .filter((r) => r.visible !== false)
+      .filter((r) => r.visible !== false || r.highlighted)
       .map((r) => {
         const Component = RegionComponents[r.type]
         return (

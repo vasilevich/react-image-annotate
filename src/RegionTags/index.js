@@ -14,6 +14,7 @@ const copyWithout = (obj, ...args) => {
 }
 
 export const RegionTags = ({
+  state,
   regions,
   projectRegionBox,
   mouseEvents,
@@ -27,12 +28,25 @@ export const RegionTags = ({
   imageSrc,
   RegionEditLabel,
   onRegionClassAdded,
-  allowComments,
 }) => {
   const RegionLabel =
     RegionEditLabel != null ? RegionEditLabel : DefaultRegionLabel
+  const mode_onlycurrentRegion={
+    "MOVE_REGION":true,
+    "RESIZE_BOX":true,
+    "MOVE_POLYGON_POINT":true,
+    "MOVE_KEYPOINT":true,
+    "DRAW_POLYGON":true,
+    "DRAW_EXPANDING_LINE":true
+  }
+  const ro = state.readOnly
+  // if(state.mode && mode_onlycurrentRegion[state.mode])
+  // {
+  //   console.debug('stateinghideothertagsmode!!',state.mode,state.regionId)
+  // }
+  // console.debug('RegionTags',{nrRe:regions.length,mode:state.mode,regionId:state.regionId})
   return regions
-    .filter((r) => r.visible || r.visible === undefined)
+    .filter((r) => (r.visible || r.visible === undefined) && ((!state.mode || !state.mode.mode || !mode_onlycurrentRegion[state.mode.mode]) || state.mode && state.mode.mode && mode_onlycurrentRegion[state.mode.mode] && state.mode.regionId==r.id))
     .map((region) => {
       const pbox = projectRegionBox(region)
       const { iw, ih } = layoutParams.current
@@ -64,7 +78,7 @@ export const RegionTags = ({
                 left: 0,
                 ...(displayOnTop ? { bottom: 0 } : { top: 0 }),
                 zIndex: 10,
-                backgroundColor: "#fff",
+               // backgroundColor: "#fff",
                 borderRadius: 4,
                 padding: 2,
                 paddingBottom: 0,
@@ -72,7 +86,7 @@ export const RegionTags = ({
                 pointerEvents: "none",
               }}
             >
-              <LockIcon style={{ width: 16, height: 16, color: "#333" }} />
+              {!ro && <LockIcon style={{ width: 16, height: 16, color: "#333" }} />}
             </Paper>
           </div>
         )
@@ -119,7 +133,7 @@ export const RegionTags = ({
               regions={regions}
               imageSrc={imageSrc}
               onRegionClassAdded={onRegionClassAdded}
-              allowComments={allowComments}
+              state={state}
             />
           </div>
         </div>

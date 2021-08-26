@@ -65,7 +65,8 @@ export default (function (_ref) {
 
       _onMouseMove({
         x: projMouse.x / iw,
-        y: projMouse.y / ih
+        y: projMouse.y / ih,
+        origE: e
       });
 
       if (dragging) {
@@ -100,7 +101,8 @@ export default (function (_ref) {
 
         _onMouseDown({
           x: projMouse.x / iw,
-          y: projMouse.y / ih
+          y: projMouse.y / ih,
+          origE: e
         });
       }
     },
@@ -161,7 +163,8 @@ export default (function (_ref) {
 
         _onMouseUp({
           x: projMouse.x / _iw,
-          y: projMouse.y / _ih
+          y: projMouse.y / _ih,
+          origE: e
         });
       }
     },

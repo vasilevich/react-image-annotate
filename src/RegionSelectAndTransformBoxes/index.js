@@ -5,10 +5,10 @@ import PreventScrollToParents from "../PreventScrollToParents"
 import { Tooltip } from "@material-ui/core"
 
 const TransformGrabber = styled("div")({
-  width: 8,
-  height: 8,
+  width: 10,
+  height: 10,
   zIndex: 2,
-  border: "2px solid #FFF",
+  border: "2px solid #fd67f0",
   position: "absolute",
 })
 
@@ -31,6 +31,7 @@ const arePropsEqual = (prev, next) => {
 export const RegionSelectAndTransformBox = memo(
   ({
     region: r,
+    state,
     mouseEvents,
     projectRegionBox,
     dragWithPrimary,
@@ -49,6 +50,8 @@ export const RegionSelectAndTransformBox = memo(
   }) => {
     const pbox = projectRegionBox(r)
     const { iw, ih } = layoutParams.current
+    const ro = state.readOnly
+    const geopoints = r.type === "geometry" && r.geometry && r.geometry.coordinates && r.geometry.coordinates[0] || undefined
     return (
       <Fragment>
         <PreventScrollToParents>
@@ -69,7 +72,7 @@ export const RegionSelectAndTransformBox = memo(
             !zoomWithPrimary &&
             !r.locked &&
             r.highlighted &&
-            mat.a < 1.2 &&
+           
             [
               [0, 0],
               [0.5, 0],
@@ -85,7 +88,7 @@ export const RegionSelectAndTransformBox = memo(
                 key={i}
                 {...mouseEvents}
                 onMouseDown={(e) => {
-                  if (e.button === 0)
+                  if (e.button === 0 && !ro)
                     return onBeginBoxTransform(r, [px * 2 - 1, py * 2 - 1])
                   mouseEvents.onMouseDown(e)
                 }}
@@ -112,7 +115,7 @@ export const RegionSelectAndTransformBox = memo(
                   key={i}
                   {...mouseEvents}
                   onMouseDown={(e) => {
-                    if (e.button === 0 && (!r.open || i === 0))
+                    if (e.button === 0 && (!r.open || i === 0)  && !ro)
                       return onBeginMovePolygonPoint(r, i)
                     mouseEvents.onMouseDown(e)
                   }}
@@ -147,7 +150,7 @@ export const RegionSelectAndTransformBox = memo(
                     key={i}
                     {...mouseEvents}
                     onMouseDown={(e) => {
-                      if (e.button === 0) return onAddPolygonPoint(r, pa, i + 1)
+                      if (e.button === 0  && !ro) return onAddPolygonPoint(r, pa, i + 1)
                       mouseEvents.onMouseDown(e)
                     }}
                     style={{
@@ -161,6 +164,41 @@ export const RegionSelectAndTransformBox = memo(
                   />
                 )
               })}
+
+        {r.type === "geometry" && geopoints &&
+            r.highlighted &&
+            !dragWithPrimary &&
+            !zoomWithPrimary &&
+            !r.locked &&
+            !r.open &&
+            geopoints.length > 1 &&
+            geopoints
+              .map((p1, i) => [p1, geopoints[(i + 1) % geopoints.length]])
+              .map(([p1, p2]) => [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2])
+              .map((pa, i) => {
+                const proj = mat
+                  .clone()
+                  .inverse()
+                  .applyToPoint(pa[0] * iw, pa[1] * ih)
+                return (
+                  <TransformGrabber
+                    key={i}
+                    {...mouseEvents}
+                    onMouseDown={(e) => {
+                      if (e.button === 0  && !ro) return onAddPolygonPoint(r, pa, i + 1)
+                      mouseEvents.onMouseDown(e)
+                    }}
+                    style={{
+                      zIndex: 10,
+                      left: proj.x - 4,
+                      top: proj.y - 4,
+                      border: "2px dotted #fff",
+                      opacity: 0.5,
+                    }}
+                  />
+                )
+              })}
+
           {r.type === "keypoints" &&
             !dragWithPrimary &&
             !zoomWithPrimary &&
@@ -178,7 +216,7 @@ export const RegionSelectAndTransformBox = memo(
                       key={i}
                       {...mouseEvents}
                       onMouseDown={(e) => {
-                        if (e.button === 0 && (!r.open || i === 0))
+                        if (e.button === 0 && (!r.open || i === 0)  && !ro)
                           return onBeginMoveKeypoint(r, keypointId)
                         mouseEvents.onMouseDown(e)
                       }}
@@ -210,11 +248,12 @@ export const RegionSelectAndTransformBox = memo(
 
 export const RegionSelectAndTransformBoxes = memo(
   (props) => {
+   // console.debug('REgionSelectAndBoxes...',props.layoutParams)
     return props.regions
       .filter((r) => r.visible || r.visible === undefined)
       .filter((r) => !r.locked)
       .map((r, i) => {
-        return <RegionSelectAndTransformBox key={r.id} {...props} region={r} />
+        return <RegionSelectAndTransformBox key={`${r.id}`} {...props} region={r} />
       })
   },
   (n, p) => n.regions === p.regions && n.mat === p.mat

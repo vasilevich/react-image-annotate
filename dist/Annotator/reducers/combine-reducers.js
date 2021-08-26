@@ -4,9 +4,28 @@ export default (function () {
   }
 
   return function (state, action) {
-    for (var _i = 0, _reducers = reducers; _i < _reducers.length; _i++) {
-      var reducer = _reducers[_i];
-      state = reducer(state, action);
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = reducers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var reducer = _step.value;
+        state = reducer(state, action);
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
     }
 
     return state;

@@ -35,7 +35,8 @@ import VideoOrImageCanvasBackground from "../VideoOrImageCanvasBackground"
 import useEventCallback from "use-event-callback"
 import RegionShapes from "../RegionShapes"
 import useWasdMode from "./use-wasd-mode"
-
+import getActiveImage from "../Annotator/reducers/get-active-image"
+import { SetLatestMAtForControl } from "../Annotator/moduleDispatcher"
 const useStyles = makeStyles(styles)
 
 type Props = {
@@ -66,7 +67,7 @@ type Props = {
   fullImageSegmentationMode?: boolean,
   autoSegmentationOptions?: Object,
   modifyingAllowedArea?: boolean,
-  allowComments?: Boolean,
+
   onChangeRegion: (Region) => any,
   onBeginRegionEdit: (Region) => any,
   onCloseRegionEdit: (Region) => any,
@@ -87,22 +88,27 @@ type Props = {
   onChangeVideoPlaying?: Function,
 }
 
-const getDefaultMat = (allowedArea = null, { iw, ih } = {}) => {
-  let mat = Matrix.from(1, 0, 0, 1, -10, -10)
+export const defaultMat={
+  lastMat:undefined
+}
+const getDefaultMat = (allowedArea = null, { iw, ih } = {}) => {  
+  let mat = defaultMat.lastMat || Matrix.from(1, 0, 0, 1, -10, -10)
   if (allowedArea && iw) {
     mat = mat
       .translate(allowedArea.x * iw, allowedArea.y * ih)
-      .scaleU(allowedArea.w + 0.05)
   }
+  defaultMat.lastMat=mat
   return mat
 }
 
 export const ImageCanvas = ({
+  state,
   regions,
   imageSrc,
   videoSrc,
   videoTime,
   realSize,
+  activeImage,
   showTags,
   onMouseMove = (p) => null,
   onMouseDown = (p) => null,
@@ -139,7 +145,6 @@ export const ImageCanvas = ({
   zoomOnAllowedArea = true,
   modifyingAllowedArea = false,
   keypointDefinitions,
-  allowComments,
 }: Props) => {
   const classes = useStyles()
 
@@ -152,7 +157,7 @@ export const ImageCanvas = ({
   const [mat, changeMat] = useRafState(getDefaultMat())
   const maskImages = useRef({})
   const windowSize = useWindowSize()
-
+  const LastImageLoaded = useState('')
   const getLatestMat = useEventCallback(() => mat)
   useWasdMode({ getLatestMat, changeMat })
 
@@ -167,7 +172,7 @@ export const ImageCanvas = ({
     changeZoomStart,
     changeZoomEnd,
     changeDragging,
-    zoomWithPrimary,
+    zoomWithPrimary, 
     dragWithPrimary,
     onMouseMove,
     onMouseDown,
@@ -185,27 +190,28 @@ export const ImageCanvas = ({
 
   const [imageDimensions, changeImageDimensions] = useState()
   const imageLoaded = Boolean(imageDimensions && imageDimensions.naturalWidth)
-
+  const canvas = canvasEl.current
   const onVideoOrImageLoaded = useEventCallback(
     ({ naturalWidth, naturalHeight, duration }) => {
       const dims = { naturalWidth, naturalHeight, duration }
       if (onImageOrVideoLoaded) onImageOrVideoLoaded(dims)
       changeImageDimensions(dims)
+     
       // Redundant update to fix rerendering issues
-      setTimeout(() => changeImageDimensions(dims), 10)
+      setTimeout(() => {
+        
+        changeImageDimensions(dims)}, 10)
     }
   )
 
-  const excludePattern = useExcludePattern()
-
-  const canvas = canvasEl.current
-  if (canvas && imageLoaded) {
+  if (canvas && imageLoaded && LastImageLoaded[0]!=imageSrc) {
     const { clientWidth, clientHeight } = canvas
 
     const fitScale = Math.max(
       imageDimensions.naturalWidth / (clientWidth - 20),
       imageDimensions.naturalHeight / (clientHeight - 20)
     )
+   // const fitScale = 1
 
     const [iw, ih] = [
       imageDimensions.naturalWidth / fitScale,
@@ -219,7 +225,13 @@ export const ImageCanvas = ({
       canvasWidth: clientWidth,
       canvasHeight: clientHeight,
     }
+    LastImageLoaded[1](imageSrc)
+    console.debug(`SetLayoutParams`,layoutParams.current)
   }
+  const excludePattern = useExcludePattern()
+
+
+  
 
   useEffect(() => {
     if (!imageLoaded) return
@@ -231,6 +243,8 @@ export const ImageCanvas = ({
     )
     // eslint-disable-next-line
   }, [imageLoaded])
+
+  defaultMat.lastMat=mat
 
   useLayoutEffect(() => {
     if (!imageDimensions) return
@@ -312,8 +326,10 @@ export const ImageCanvas = ({
     return highlightedRegions[0]
   }, [regions])
 
+  SetLatestMAtForControl(state,mat)
   return (
     <div
+    className="imageCanvasInstaceClass"
       style={{
         width: "100%",
         height: "100%",
@@ -338,7 +354,8 @@ export const ImageCanvas = ({
       )}
       {imageLoaded && !dragging && (
         <RegionSelectAndTransformBoxes
-          key="regionSelectAndTransformBoxes"
+          key={"regionSelectAndTransformBoxes"}
+          state={state}
           regions={
             !modifyingAllowedArea || !allowedArea
               ? regions
@@ -376,6 +393,7 @@ export const ImageCanvas = ({
       {imageLoaded && showTags && !dragging && (
         <PreventScrollToParents key="regionTags">
           <RegionTags
+          state={state}
             regions={regions}
             projectRegionBox={projectRegionBox}
             mouseEvents={mouseEvents}
@@ -389,12 +407,13 @@ export const ImageCanvas = ({
             imageSrc={imageSrc}
             RegionEditLabel={RegionEditLabel}
             onRegionClassAdded={onRegionClassAdded}
-            allowComments={allowComments}
           />
         </PreventScrollToParents>
       )}
       {!showTags && highlightedRegion && (
-        <div key="topLeftTag" className={classes.fixedRegionLabel}>
+        <div  onClick={()=>{
+          console.debug('REACTSTATE',state)
+        }} key="topLeftTag" className={classes.fixedRegionLabel}>
           <RegionLabel
             disableClose
             allowedClasses={regionClsList}
@@ -404,13 +423,14 @@ export const ImageCanvas = ({
             editing
             region={highlightedRegion}
             imageSrc={imageSrc}
-            allowComments={allowComments}
+            state={state}
           />
         </div>
       )}
 
       {zoomWithPrimary && zoomBox !== null && (
         <div
+
           key="zoomBox"
           style={{
             position: "absolute",
@@ -462,6 +482,7 @@ export const ImageCanvas = ({
           />
           <VideoOrImageCanvasBackground
             videoPlaying={videoPlaying}
+            state={state}
             imagePosition={imagePosition}
             mouseEvents={mouseEvents}
             onLoad={onVideoOrImageLoaded}
@@ -472,9 +493,23 @@ export const ImageCanvas = ({
             onChangeVideoTime={onChangeVideoTime}
             onChangeVideoPlaying={onChangeVideoPlaying}
           />
+          {activeImage && activeImage.heatmaps && activeImage.heatmaps.length && activeImage.heatmaps.map((url,i)=>{
+            return   <VideoOrImageCanvasBackground
+            key={url+i}
+            state={state}
+            videoPlaying={false}
+            imagePosition={imagePosition}
+            mouseEvents={mouseEvents}
+            imageSrc={url}
+            useCrossOrigin={fullImageSegmentationMode}
+          />
+          }) }
         </>
       </PreventScrollToParents>
-      <div className={classes.zoomIndicator}>
+      <div  onClick={()=>{
+        const ac=getActiveImage(state)
+          console.debug('REACTSTATE',{img:ac && state.images[ac.currentImageIndex], activeImg:ac,state})
+        }} className={classes.zoomIndicator}>
         {((1 / mat.a) * 100).toFixed(0)}%
       </div>
     </div>

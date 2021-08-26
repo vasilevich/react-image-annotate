@@ -40,9 +40,5 @@ export default {
         textDecoration: "underline"
       }
     }
-  },
-  commentBox: {
-    fontWeight: 400,
-    fontSize: 13
   }
 };

@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useMemo, useState } from "react"
 import { styled } from "@material-ui/core/styles"
 import useEventCallback from "use-event-callback"
 import { useSettings } from "../SettingsProvider"
+import { GetInjectedImageState } from "../Annotator/moduleDispatcher"
 
 const Video = styled("video")({
   zIndex: 0,
@@ -30,6 +31,7 @@ const Error = styled("div")({
 })
 
 export default ({
+  state,
   imagePosition,
   mouseEvents,
   videoTime,
@@ -110,13 +112,9 @@ export default ({
   })
   const onImageError = useEventCallback((event) => {
     setError(
-      `Could not load image\n\nMake sure your image works by visiting ${
+      `!\n\n${
         imageSrc || videoSrc
-      } in a web browser. If that URL works, the server hosting the URL may be not allowing you to access the image from your current domain. Adjust server settings to enable the image to be viewed.${
-        !useCrossOrigin
-          ? ""
-          : `\n\nYour image may be blocked because it's not being sent with CORs headers. To do pixel segmentation, browser web security requires CORs headers in order for the algorithm to read the pixel data from the image. CORs headers are easy to add if you're using an S3 bucket or own the server hosting your images.`
-      }\n\n If you need a hand, reach out to the community at universaldatatool.slack.com`
+      }`
     )
   })
 
@@ -137,12 +135,18 @@ export default ({
     imagePosition.bottomRight.y,
   ])
 
-  if (!videoSrc && !imageSrc)
+  const injectedCanvas = GetInjectedImageState(state,imageSrc || videoSrc || '')
+  if (!videoSrc && !imageSrc && !injectedCanvas)
     return <Error>No imageSrc or videoSrc provided</Error>
+
+  
 
   if (error) return <Error>{error}</Error>
 
-  return imageSrc && videoTime === undefined ? (
+  return <>
+  {injectedCanvas && !!(injectedCanvas.CanvasWrapper) && <injectedCanvas.CanvasWrapper {...injectedCanvas.props} style={stylePosition}  /> 
+  || (
+    imageSrc && videoTime === undefined &&
     <StyledImage
       {...mouseEvents}
       src={imageSrc}
@@ -151,14 +155,15 @@ export default ({
       onLoad={onImageLoaded}
       onError={onImageError}
       crossOrigin={useCrossOrigin ? "anonymous" : undefined}
-    />
-  ) : (
-    <Video
+    /> || ((imageSrc || videoSrc) && <Video
       {...mouseEvents}
       ref={videoRef}
       style={stylePosition}
       onLoadedMetadata={onLoadedVideoMetadata}
       src={videoSrc || imageSrc}
-    />
+    />)
   )
+  }
+  )
+  </>
 }

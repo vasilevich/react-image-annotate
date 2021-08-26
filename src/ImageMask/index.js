@@ -68,6 +68,7 @@ export const ImageMask = ({
       })
       autoseg.loadImage(imageData)
       setSampleImageData(imageData)
+      
     })
   }, [imageSrc])
 
@@ -79,15 +80,20 @@ export const ImageMask = ({
       if (regions.filter((cp) => cp.cls).length < 2) return
 
       const udtRegions = convertToUDTRegions(regions)
-
+      autoseg.setConfig({
+        classNames: regionClsList,
+        ...autoSegmentationOptions,
+      })
       autoseg.getMask(udtRegions).then((maskImageData) => {
         const context = canvasRef.getContext("2d")
         context.clearRect(0, 0, maskImageData.width, maskImageData.height)
         context.putImageData(maskImageData, 0, 0)
+        console.debug('DEBOUNCE MASK AUTOSEG GOTMAST')
       })
+      console.debug('DEBOUNCE MASK AUTOSEG')
     },
     1000,
-    [canvasRef, sampleImageData, regions, hide]
+    [canvasRef, sampleImageData, regions, hide,autoSegmentationOptions && autoSegmentationOptions.maxClusters]
   )
 
   const style = useMemo(() => {

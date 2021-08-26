@@ -57,7 +57,7 @@ export default ({
       }
 
       const { iw, ih } = layoutParams.current
-      onMouseMove({ x: projMouse.x / iw, y: projMouse.y / ih })
+      onMouseMove({ x: projMouse.x / iw, y: projMouse.y / ih, origE:e })
 
       if (dragging) {
         mat.translate(
@@ -96,7 +96,7 @@ export default ({
           // onResizeBox()
         }
         const { iw, ih } = layoutParams.current
-        onMouseDown({ x: projMouse.x / iw, y: projMouse.y / ih })
+        onMouseDown({ x: projMouse.x / iw, y: projMouse.y / ih,origE:e })
       }
     },
     onMouseUp: (e) => {
@@ -152,7 +152,7 @@ export default ({
         return changeDragging(false)
       if (e.button === 0) {
         const { iw, ih } = layoutParams.current
-        onMouseUp({ x: projMouse.x / iw, y: projMouse.y / ih })
+        onMouseUp({ x: projMouse.x / iw, y: projMouse.y / ih,origE:e })
       }
     },
     onWheel: (e) => {
