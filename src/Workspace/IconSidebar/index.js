@@ -1,8 +1,8 @@
 import React from "react"
-import { styled } from "@material-ui/core/styles"
+import {styled} from "@material-ui/core/styles"
 import IconButton from "@material-ui/core/IconButton"
-import { iconMapping } from "../icon-mapping.js"
-import { useIconDictionary } from "../icon-dictionary"
+import {iconMapping} from "../icon-mapping.js"
+import {useIconDictionary} from "../icon-dictionary"
 import Tooltip from "@material-ui/core/Tooltip"
 
 const Container = styled("div")({
@@ -25,10 +25,10 @@ type Props = {
 const emptyAr = []
 
 export const IconSidebar = ({
-  items = emptyAr,
-  onClickItem,
-  selectedTools = emptyAr,
-}: Props) => {
+                              items = emptyAr,
+                              onClickItem,
+                              selectedTools = emptyAr,
+                            }: Props) => {
   const customIconMapping = useIconDictionary()
   return (
     <Container>
@@ -46,10 +46,11 @@ export const IconSidebar = ({
                 ? "primary"
                 : "default"
             }
+            className={(item.selected || selectedTools.includes(item.name.toLowerCase())) ? 'selected' : ''}
             disabled={Boolean(item.disabled)}
             onClick={item.onClick ? item.onClick : () => onClickItem(item)}
           >
-            {item.icon || <NameIcon />}
+            {item.icon || <NameIcon/>}
           </IconButton>
         )
 

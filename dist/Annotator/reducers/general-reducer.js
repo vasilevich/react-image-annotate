@@ -163,7 +163,9 @@ export default (function (state, action, readonly) {
           var clsIndex = state.regionClsList.indexOf(action.region.cls);
 
           if (clsIndex !== -1) {
-            action.region.color = colors[clsIndex % colors.length];
+            if (Array.isArray(state.colors) && state.colors.length === state.regionClsList.length) {
+              action.region.color = state.colors[clsIndex % state.colors.length];
+            } else action.region.color = colors[clsIndex % colors.length];
           }
         }
 
@@ -593,7 +595,9 @@ export default (function (state, action, readonly) {
           var _clsIndex = (state.regionClsList || []).indexOf(defaultRegionCls);
 
           if (_clsIndex !== -1) {
-            defaultRegionColor = colors[_clsIndex % colors.length];
+            if (Array.isArray(state.colors) && state.colors.length === state.regionClsList.length) {
+              defaultRegionColor = state.colors[_clsIndex % state.colors.length];
+            } else defaultRegionColor = colors[_clsIndex % colors.length];
           }
         }
 

@@ -36,7 +36,7 @@ export const HistorySidebarBox = ({
 
   return (
     <SidebarBoxContainer
-      title="History"
+      title="Changes in current session"
       icon={<HistoryIcon/>}
       expandedByDefault
     >

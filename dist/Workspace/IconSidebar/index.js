@@ -24,6 +24,7 @@ export var IconSidebar = function IconSidebar(_ref) {
     var buttonPart = React.createElement(IconButton, {
       key: item.name,
       color: item.selected || selectedTools.includes(item.name.toLowerCase()) ? "primary" : "default",
+      className: item.selected || selectedTools.includes(item.name.toLowerCase()) ? 'selected' : '',
       disabled: Boolean(item.disabled),
       onClick: item.onClick ? item.onClick : function () {
         return onClickItem(item);

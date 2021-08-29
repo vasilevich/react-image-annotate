@@ -235,7 +235,6 @@ export var MainLayout = function MainLayout(_ref2) {
     handlers: hotkeyHandlers,
     className: classnames(classes.container, state.fullScreen && "Fullscreen")
   }, React.createElement(Workspace, {
-    allowFullscreen: true,
     rightSidebarOnLeft: rightSidebarOnLeft,
     iconDictionary: iconDictionary,
     hideHeader: hideHeader,
@@ -262,13 +261,9 @@ export var MainLayout = function MainLayout(_ref2) {
       name: "Play"
     } : {
       name: "Pause"
-    }, !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && {
-      name: "Settings"
-    }, !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) && (state.fullScreen ? {
-      name: "Window"
-    } : {
-      name: "Fullscreen"
-    }), !(topBarOpts && topBarOpts.hide && topBarOpts.hide.save) && {
+    }, //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && { name: "Settings" },
+    //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) &&  (state.fullScreen ? { name: "Window" } : { name: "Fullscreen" }),
+    !(topBarOpts && topBarOpts.hide && topBarOpts.hide.save) && {
       name: "Save"
     }].filter(Boolean),
     onClickHeaderItem: onClickHeaderItem,

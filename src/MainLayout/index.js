@@ -150,7 +150,6 @@ export const MainLayout = ({
       e.target.focus()
     }
   }, [])
-
   const canvas = (
     <ImageCanvas
       {...settings}
@@ -265,7 +264,6 @@ export const MainLayout = ({
           )}
         >
           <Workspace
-            allowFullscreen
             rightSidebarOnLeft={rightSidebarOnLeft}
             iconDictionary={iconDictionary}
             hideHeader={hideHeader}
@@ -294,8 +292,8 @@ export const MainLayout = ({
                 : !state.videoPlaying
                 ? { name: "Play" }
                 : { name: "Pause" },
-              !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && { name: "Settings" },
-              !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) &&  (state.fullScreen ? { name: "Window" } : { name: "Fullscreen" }),
+            //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && { name: "Settings" },
+            //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) &&  (state.fullScreen ? { name: "Window" } : { name: "Fullscreen" }),
               !(topBarOpts && topBarOpts.hide && topBarOpts.hide.save) && { name: "Save" },
             ].filter(Boolean)}
             onClickHeaderItem={onClickHeaderItem}

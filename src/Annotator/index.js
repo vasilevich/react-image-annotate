@@ -23,6 +23,7 @@ import useEventCallback from "use-event-callback"
 import makeImmutable, { without } from "seamless-immutable"
 import getFromLocalStorage from "../utils/get-from-local-storage"
 import { AnnotatorModule } from './moduleDispatcher'
+import {indexOf} from "lodash";
 
 
 
@@ -30,7 +31,7 @@ type Props = {
   taskDescription?: string,
   allowedArea?: { x: number, y: number, w: number, h: number },
   regionTagList?: Array<string>,
-  regionClsList?: Array<string>,
+  regionClsList?: Array<string> | Array<{name:string,color:string}>,
   imageTagList?: Array<string>,
   imageClsList?: Array<string>,
   enabledTools?: Array<string>,
@@ -107,6 +108,19 @@ export const Annotator = ({
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
     if (selectedImage === -1) selectedImage = undefined
   }
+  const colors = [];
+  for(const clsIndex in regionClsList){
+    const cls = regionClsList[clsIndex];
+    if(typeof cls !=='string'){
+      let color = cls.color;
+      while(color.startsWith("#")){
+        color=color.slice(1);
+      }
+      colors.push(`#${color}`);
+      regionClsList[clsIndex] = cls.name;
+    }
+  }
+
   const annotationType = images ? "image" : "video"
   const [state, dispatchToReducer] = useReducer(
     historyHandler(
@@ -129,6 +143,7 @@ export const Annotator = ({
       showMask: true,
       labelImages: imageClsList.length > 0 || imageTagList.length > 0,
       regionClsList,
+      colors,
       regionTagList,
       imageClsList,
       hideRightSidebarSections,
@@ -175,7 +190,7 @@ export const Annotator = ({
 
 
   AnnotatorModule.dispatch=dispatch;
-  
+
   const onRegionClassAdded = useEventCallback((cls) => {
     dispatchToReducer({
       type: "ON_CLS_ADDED",

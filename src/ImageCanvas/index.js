@@ -91,7 +91,7 @@ type Props = {
 export const defaultMat={
   lastMat:undefined
 }
-const getDefaultMat = (allowedArea = null, { iw, ih } = {}) => {  
+const getDefaultMat = (allowedArea = null, { iw, ih } = {}) => {
   let mat = defaultMat.lastMat || Matrix.from(1, 0, 0, 1, -10, -10)
   if (allowedArea && iw) {
     mat = mat
@@ -172,7 +172,7 @@ export const ImageCanvas = ({
     changeZoomStart,
     changeZoomEnd,
     changeDragging,
-    zoomWithPrimary, 
+    zoomWithPrimary,
     dragWithPrimary,
     onMouseMove,
     onMouseDown,
@@ -196,10 +196,10 @@ export const ImageCanvas = ({
       const dims = { naturalWidth, naturalHeight, duration }
       if (onImageOrVideoLoaded) onImageOrVideoLoaded(dims)
       changeImageDimensions(dims)
-     
+
       // Redundant update to fix rerendering issues
       setTimeout(() => {
-        
+
         changeImageDimensions(dims)}, 10)
     }
   )
@@ -231,7 +231,7 @@ export const ImageCanvas = ({
   const excludePattern = useExcludePattern()
 
 
-  
+
 
   useEffect(() => {
     if (!imageLoaded) return
@@ -329,11 +329,12 @@ export const ImageCanvas = ({
   SetLatestMAtForControl(state,mat)
   return (
     <div
-    className="imageCanvasInstaceClass"
+      key="zoomBox_841"
+      className="imageCanvasInstaceClass"
       style={{
         width: "100%",
         height: "100%",
-        maxHeight: "calc(100vh - 68px)",
+        maxHeight: "calc(100vh - 126px)",
         position: "relative",
         overflow: "hidden",
         cursor: createWithPrimary
@@ -393,7 +394,8 @@ export const ImageCanvas = ({
       {imageLoaded && showTags && !dragging && (
         <PreventScrollToParents key="regionTags">
           <RegionTags
-          state={state}
+            key="zoomBox_841"
+            state={state}
             regions={regions}
             projectRegionBox={projectRegionBox}
             mouseEvents={mouseEvents}
@@ -411,10 +413,13 @@ export const ImageCanvas = ({
         </PreventScrollToParents>
       )}
       {!showTags && highlightedRegion && (
-        <div  onClick={()=>{
+        <div
+          key="zoomBox_941"
+          onClick={()=>{
           console.debug('REACTSTATE',state)
         }} key="topLeftTag" className={classes.fixedRegionLabel}>
           <RegionLabel
+            key="zoomBox_945"
             disableClose
             allowedClasses={regionClsList}
             allowedTags={regionTagList}
@@ -430,8 +435,7 @@ export const ImageCanvas = ({
 
       {zoomWithPrimary && zoomBox !== null && (
         <div
-
-          key="zoomBox"
+          key="zoomBox_943"
           style={{
             position: "absolute",
             zIndex: 1,
@@ -446,6 +450,7 @@ export const ImageCanvas = ({
       )}
       {showPointDistances && (
         <PointDistances
+          key="regionShapes_8"
           key="pointDistances"
           regions={regions}
           realSize={realSize}
@@ -454,12 +459,14 @@ export const ImageCanvas = ({
         />
       )}
       <PreventScrollToParents
+        key="regionShapes_5"
         style={{ width: "100%", height: "100%" }}
         {...mouseEvents}
       >
         <>
           {fullImageSegmentationMode && (
             <ImageMask
+              key="regionShapes_0"
               hide={!showMask}
               autoSegmentationOptions={autoSegmentationOptions}
               imagePosition={imagePosition}
@@ -474,6 +481,7 @@ export const ImageCanvas = ({
             ref={canvasEl}
           />
           <RegionShapes
+            key="regionShapes_1"
             mat={mat}
             keypointDefinitions={keypointDefinitions}
             imagePosition={imagePosition}
@@ -481,6 +489,7 @@ export const ImageCanvas = ({
             fullSegmentationMode={fullImageSegmentationMode}
           />
           <VideoOrImageCanvasBackground
+            key="regionShapes_2"
             videoPlaying={videoPlaying}
             state={state}
             imagePosition={imagePosition}

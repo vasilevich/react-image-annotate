@@ -36,10 +36,11 @@ export const Header = ({
   onClickItem,
 }: Props) => {
   return (
-    <Container>
+    <Container className={'topMenu'}>
       <Box style={{display:'flex',flexWrap:'wrap',flexDirection:'row',alignItems:'center'}} flexGrow={1}>{leftSideContent}
       {headerSubSection}
       </Box>
+      {addedItems}
       {items.map((item) => (
         <HeaderButton
           key={item.name}
@@ -48,7 +49,6 @@ export const Header = ({
           {...item}
         />
       ))}
-      {addedItems}
     </Container>
   )
 }

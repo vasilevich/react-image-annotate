@@ -259,10 +259,10 @@ export var WrappedRegionList = memo(function (_ref19) {
       fullSegmentationMode = _ref19.fullSegmentationMode;
   return regions.filter(function (r) {
     return r.visible !== false || r.highlighted;
-  }).map(function (r) {
+  }).map(function (r, index) {
     var Component = RegionComponents[r.type];
     return React.createElement(Component, {
-      key: r.regionId,
+      key: "".concat(iw, "_").concat(ih, "_").concat(r.type, "_").concat(r.regionId, "_").concat(index),
       region: r,
       iw: iw,
       ih: ih,
@@ -284,6 +284,7 @@ export var RegionShapes = function RegionShapes(_ref20) {
   var ih = imagePosition.bottomRight.y - imagePosition.topLeft.y;
   if (isNaN(iw) || isNaN(ih)) return null;
   return React.createElement("svg", {
+    key: "".concat(iw, "-").concat(ih),
     width: iw,
     height: ih,
     style: {
@@ -296,7 +297,7 @@ export var RegionShapes = function RegionShapes(_ref20) {
       height: ih
     }
   }, React.createElement(WrappedRegionList, {
-    key: "wrapped-region-list",
+    key: "wrapped-region-lis-".concat(iw, "-").concat(ih),
     regions: regions,
     iw: iw,
     ih: ih,

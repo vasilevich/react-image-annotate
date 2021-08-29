@@ -7,8 +7,8 @@ import { Tooltip } from "@material-ui/core"
 const TransformGrabber = styled("div")({
   width: 10,
   height: 10,
-  zIndex: 2,
-  border: "2px solid #fd67f0",
+  zIndex: 4,
+  border: "2px solid white",
   position: "absolute",
 })
 
@@ -72,7 +72,7 @@ export const RegionSelectAndTransformBox = memo(
             !zoomWithPrimary &&
             !r.locked &&
             r.highlighted &&
-           
+
             [
               [0, 0],
               [0.5, 0],

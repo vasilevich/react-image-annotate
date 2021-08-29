@@ -7,8 +7,8 @@ import { Tooltip } from "@material-ui/core";
 var TransformGrabber = styled("div")({
   width: 10,
   height: 10,
-  zIndex: 2,
-  border: "2px solid #fd67f0",
+  zIndex: 4,
+  border: "2px solid white",
   position: "absolute"
 });
 var boxCursorMap = [["nw-resize", "n-resize", "ne-resize"], ["w-resize", "grab", "e-resize"], ["sw-resize", "s-resize", "se-resize"]];

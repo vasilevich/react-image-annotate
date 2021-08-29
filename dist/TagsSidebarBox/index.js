@@ -1,8 +1,7 @@
-import React, { useMemo, memo } from "react";
+import React, { memo, useMemo } from "react";
 import SidebarBoxContainer from "../SidebarBoxContainer";
 import { makeStyles } from "@material-ui/core/styles";
 import StyleIcon from "@material-ui/icons/Style";
-import { grey } from "@material-ui/core/colors";
 import Select from "react-select";
 import useEventCallback from "use-event-callback";
 import { asMutable } from "seamless-immutable";
@@ -85,7 +84,7 @@ export var TagsSidebarBox = function TagsSidebarBox(_ref) {
     onChange: onChangeClassification,
     value: selectValue,
     options: memoImgClsList
-  })), imageTagList.length > 0 && React.createElement("div", {
+  })), false && imageTagList.length > 0 && React.createElement("div", {
     style: {
       padding: 8,
       paddingTop: 0

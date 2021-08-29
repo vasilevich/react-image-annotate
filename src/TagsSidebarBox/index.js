@@ -1,13 +1,12 @@
 // @flow
 
-import React, { useMemo, memo } from "react"
+import React, {memo, useMemo} from "react"
 import SidebarBoxContainer from "../SidebarBoxContainer"
-import { makeStyles } from "@material-ui/core/styles"
+import {makeStyles} from "@material-ui/core/styles"
 import StyleIcon from "@material-ui/icons/Style"
-import { grey } from "@material-ui/core/colors"
 import Select from "react-select"
 import useEventCallback from "use-event-callback"
-import { asMutable } from "seamless-immutable"
+import {asMutable} from "seamless-immutable"
 
 const useStyles = makeStyles({})
 
@@ -23,31 +22,31 @@ const emptyArr = []
 const noop = () => null
 
 export const TagsSidebarBox = ({
-  currentImage,
-  imageClsList = emptyArr,
-  imageTagList = emptyArr,
-  onChangeImage = noop,
-}: Props) => {
-  const { tags = [], cls = null } = currentImage || {}
+                                 currentImage,
+                                 imageClsList = emptyArr,
+                                 imageTagList = emptyArr,
+                                 onChangeImage = noop,
+                               }: Props) => {
+  const {tags = [], cls = null} = currentImage || {}
   const onChangeClassification = useEventCallback((o) =>
-    onChangeImage({ cls: o.value })
+    onChangeImage({cls: o.value})
   )
   const onChangeTags = useEventCallback((o) =>
-    onChangeImage({ tags: o.map((a) => a.value) })
+    onChangeImage({tags: o.map((a) => a.value)})
   )
-  const selectValue = useMemo(() => (cls ? { value: cls, label: cls } : null), [
+  const selectValue = useMemo(() => (cls ? {value: cls, label: cls} : null), [
     cls,
   ])
   const memoImgClsList = useMemo(
-    () => asMutable(imageClsList.map((c) => ({ value: c, label: c }))),
+    () => asMutable(imageClsList.map((c) => ({value: c, label: c}))),
     [imageClsList]
   )
   const memoImgTagList = useMemo(
-    () => asMutable(imageTagList.map((c) => ({ value: c, label: c }))),
+    () => asMutable(imageTagList.map((c) => ({value: c, label: c}))),
     [imageTagList]
   )
   const memoCurrentTags = useMemo(
-    () => tags.map((r) => ({ value: r, label: r })),
+    () => tags.map((r) => ({value: r, label: r})),
     [tags]
   )
 
@@ -61,7 +60,7 @@ export const TagsSidebarBox = ({
       icon={<StyleIcon/>}
     >
       {imageClsList.length > 0 && (
-        <div style={{ padding: 8 }}>
+        <div style={{padding: 8}}>
           <Select
             placeholder="Image Classification"
             onChange={onChangeClassification}
@@ -70,8 +69,8 @@ export const TagsSidebarBox = ({
           />
         </div>
       )}
-      {imageTagList.length > 0 && (
-        <div style={{ padding: 8, paddingTop: 0 }}>
+      {false && imageTagList.length > 0 && (
+        <div style={{padding: 8, paddingTop: 0}}>
           <Select
             isMulti
             placeholder="Image Tags"

@@ -12,6 +12,7 @@ import useEventCallback from "use-event-callback";
 import makeImmutable, { without } from "seamless-immutable";
 import getFromLocalStorage from "../utils/get-from-local-storage";
 import { AnnotatorModule } from './moduleDispatcher';
+import { indexOf } from "lodash";
 export var Annotator = function Annotator(_ref) {
   var images = _ref.images,
       allowedArea = _ref.allowedArea,
@@ -78,6 +79,23 @@ export var Annotator = function Annotator(_ref) {
     if (selectedImage === -1) selectedImage = undefined;
   }
 
+  var colors = [];
+
+  for (var clsIndex in regionClsList) {
+    var cls = regionClsList[clsIndex];
+
+    if (typeof cls !== 'string') {
+      var color = cls.color;
+
+      while (color.startsWith("#")) {
+        color = color.slice(1);
+      }
+
+      colors.push("#".concat(color));
+      regionClsList[clsIndex] = cls.name;
+    }
+  }
+
   var annotationType = images ? "image" : "video";
 
   var _useReducer = useReducer(historyHandler(combineReducers(annotationType === "image" ? imageReducer : videoReducer, generalReducer)), makeImmutable(_objectSpread({
@@ -94,6 +112,7 @@ export var Annotator = function Annotator(_ref) {
     showMask: true,
     labelImages: imageClsList.length > 0 || imageTagList.length > 0,
     regionClsList: regionClsList,
+    colors: colors,
     regionTagList: regionTagList,
     imageClsList: imageClsList,
     hideRightSidebarSections: hideRightSidebarSections,

@@ -14,7 +14,7 @@ export default {
     color: "#fff",
     opacity: 0.5,
     fontWeight: "bolder",
-    fontSize: 14,
+    fontSize: 25,
     padding: 4,
     zIndex: 2
   },

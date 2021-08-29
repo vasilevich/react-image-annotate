@@ -154,7 +154,11 @@ export default (state: MainLayoutState, action: Action, readonly) => {
         state = saveToHistory(state, "Change Region Classification")
         const clsIndex = state.regionClsList.indexOf(action.region.cls)
         if (clsIndex !== -1) {
-          action.region.color = colors[clsIndex % colors.length]
+          if (Array.isArray(state.colors) && state.colors.length === state.regionClsList.length) {
+            action.region.color = state.colors[clsIndex % state.colors.length]
+          }
+          else
+            action.region.color = colors[clsIndex % colors.length]
         }
       }
       if (!isEqual(oldRegion.tags, action.region.tags)) {
@@ -530,7 +534,11 @@ export default (state: MainLayoutState, action: Action, readonly) => {
         defaultRegionCls = activeImage.regions.slice(-1)[0].cls
         const clsIndex = (state.regionClsList || []).indexOf(defaultRegionCls)
         if (clsIndex !== -1) {
-          defaultRegionColor = colors[clsIndex % colors.length]
+          if (Array.isArray(state.colors) && state.colors.length === state.regionClsList.length) {
+            defaultRegionColor = state.colors[clsIndex % state.colors.length]
+          }
+          else
+            defaultRegionColor = colors[clsIndex % colors.length]
         }
       }
 

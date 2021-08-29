@@ -25,7 +25,9 @@ export var Header = function Header(_ref) {
       addedItems = _ref.addedItems,
       headerSubSection = _ref.headerSubSection,
       onClickItem = _ref.onClickItem;
-  return React.createElement(Container, null, React.createElement(Box, {
+  return React.createElement(Container, {
+    className: 'topMenu'
+  }, React.createElement(Box, {
     style: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -33,7 +35,7 @@ export var Header = function Header(_ref) {
       alignItems: 'center'
     },
     flexGrow: 1
-  }, leftSideContent, headerSubSection), items.map(function (item) {
+  }, leftSideContent, headerSubSection), addedItems, items.map(function (item) {
     return React.createElement(HeaderButton, Object.assign({
       key: item.name,
       hideText: hideHeaderText,
@@ -41,6 +43,6 @@ export var Header = function Header(_ref) {
         return onClickItem(item);
       }
     }, item));
-  }), addedItems);
+  }));
 };
 export default Header;

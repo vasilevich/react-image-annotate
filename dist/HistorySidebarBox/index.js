@@ -28,7 +28,7 @@ export var HistorySidebarBox = function HistorySidebarBox(_ref) {
       onRestoreHistory = _ref.onRestoreHistory;
   var classes = useStyles();
   return React.createElement(SidebarBoxContainer, {
-    title: "History",
+    title: "Changes in current session",
     icon: React.createElement(HistoryIcon, null),
     expandedByDefault: true
   }, React.createElement(List, null, history.length === 0 && React.createElement("div", {

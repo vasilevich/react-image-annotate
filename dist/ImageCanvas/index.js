@@ -1,3 +1,4 @@
+import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
 import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
 import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
@@ -46,6 +47,8 @@ var getDefaultMat = function getDefaultMat() {
 };
 
 export var ImageCanvas = function ImageCanvas(_ref2) {
+  var _React$createElement, _React$createElement2;
+
   var state = _ref2.state,
       regions = _ref2.regions,
       imageSrc = _ref2.imageSrc,
@@ -301,11 +304,12 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
   }, [regions]);
   SetLatestMAtForControl(state, mat);
   return React.createElement("div", {
+    key: "zoomBox_841",
     className: "imageCanvasInstaceClass",
     style: {
       width: "100%",
       height: "100%",
-      maxHeight: "calc(100vh - 68px)",
+      maxHeight: "calc(100vh - 126px)",
       position: "relative",
       overflow: "hidden",
       cursor: createWithPrimary ? "crosshair" : dragging ? "grabbing" : dragWithPrimary ? "grab" : zoomWithPrimary ? mat.a < 1 ? "zoom-out" : "zoom-in" : undefined
@@ -345,6 +349,7 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
   }), imageLoaded && showTags && !dragging && React.createElement(PreventScrollToParents, {
     key: "regionTags"
   }, React.createElement(RegionTags, {
+    key: "zoomBox_841",
     state: state,
     regions: regions,
     projectRegionBox: projectRegionBox,
@@ -359,13 +364,13 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     imageSrc: imageSrc,
     RegionEditLabel: RegionEditLabel,
     onRegionClassAdded: onRegionClassAdded
-  })), !showTags && highlightedRegion && React.createElement("div", {
+  })), !showTags && highlightedRegion && React.createElement("div", (_React$createElement = {
+    key: "zoomBox_941",
     onClick: function onClick() {
       console.debug('REACTSTATE', state);
-    },
-    key: "topLeftTag",
-    className: classes.fixedRegionLabel
-  }, React.createElement(RegionLabel, {
+    }
+  }, _defineProperty(_React$createElement, "key", "topLeftTag"), _defineProperty(_React$createElement, "className", classes.fixedRegionLabel), _React$createElement), React.createElement(RegionLabel, {
+    key: "zoomBox_945",
     disableClose: true,
     allowedClasses: regionClsList,
     allowedTags: regionTagList,
@@ -376,7 +381,7 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     imageSrc: imageSrc,
     state: state
   })), zoomWithPrimary && zoomBox !== null && React.createElement("div", {
-    key: "zoomBox",
+    key: "zoomBox_943",
     style: {
       position: "absolute",
       zIndex: 1,
@@ -387,18 +392,16 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
       width: zoomBox.w,
       height: zoomBox.h
     }
-  }), showPointDistances && React.createElement(PointDistances, {
-    key: "pointDistances",
-    regions: regions,
-    realSize: realSize,
-    projectRegionBox: projectRegionBox,
-    pointDistancePrecision: pointDistancePrecision
-  }), React.createElement(PreventScrollToParents, Object.assign({
+  }), showPointDistances && React.createElement(PointDistances, (_React$createElement2 = {
+    key: "regionShapes_8"
+  }, _defineProperty(_React$createElement2, "key", "pointDistances"), _defineProperty(_React$createElement2, "regions", regions), _defineProperty(_React$createElement2, "realSize", realSize), _defineProperty(_React$createElement2, "projectRegionBox", projectRegionBox), _defineProperty(_React$createElement2, "pointDistancePrecision", pointDistancePrecision), _React$createElement2)), React.createElement(PreventScrollToParents, Object.assign({
+    key: "regionShapes_5",
     style: {
       width: "100%",
       height: "100%"
     }
   }, mouseEvents), React.createElement(React.Fragment, null, fullImageSegmentationMode && React.createElement(ImageMask, {
+    key: "regionShapes_0",
     hide: !showMask,
     autoSegmentationOptions: autoSegmentationOptions,
     imagePosition: imagePosition,
@@ -412,12 +415,14 @@ export var ImageCanvas = function ImageCanvas(_ref2) {
     className: classes.canvas,
     ref: canvasEl
   }), React.createElement(RegionShapes, {
+    key: "regionShapes_1",
     mat: mat,
     keypointDefinitions: keypointDefinitions,
     imagePosition: imagePosition,
     regions: regions,
     fullSegmentationMode: fullImageSegmentationMode
   }), React.createElement(VideoOrImageCanvasBackground, {
+    key: "regionShapes_2",
     videoPlaying: videoPlaying,
     state: state,
     imagePosition: imagePosition,

@@ -37,7 +37,7 @@ const RegionComponents = {
     </g></>
   )}),
   geometry:  memo(({ region, iw, ih }) => {
-    const point0 = region.geometry?.coordinates && region.geometry.coordinates[0] && region.geometry.coordinates[0][0] 
+    const point0 = region.geometry?.coordinates && region.geometry.coordinates[0] && region.geometry.coordinates[0][0]
     return (
       region.geometry && region.geometry.coordinates && <>
         {region.text && point0 &&  <text x={point0[0] * iw} y={point0[1] * ih} style={{fontWeight:'bold',
@@ -45,15 +45,15 @@ const RegionComponents = {
        <path fill={colorAlpha(region.color, region.highlighted && 0.6 || 0.37)} fillRule="evenodd"
        d={ region.geometry.coordinates.map(coords=>{
         return  `M ${coords.map(coord=>`${coord[0]*iw} ${coord[1] * ih}`).join(" ")} Z`
-      }).join(" ")  } /> 
+      }).join(" ")  } />
       </>
     )
   }),
   polygon: memo(({ region, iw, ih, fullSegmentationMode }) => {
     const Component = region.open ? "polyline" : "polygon"
     const alphaBase = fullSegmentationMode ? 0.5 : 1
-    const point0 = region.points && region.points[0] 
-    
+    const point0 = region.points && region.points[0]
+
     return (
       <>
       {region.text && point0 &&  <text x={point0[0] * iw} y={point0[1] * ih} style={{fontWeight:'bold',
@@ -193,11 +193,11 @@ export const WrappedRegionList = memo(
   ({ regions, keypointDefinitions, iw, ih, fullSegmentationMode }) => {
     return regions
       .filter((r) => r.visible !== false || r.highlighted)
-      .map((r) => {
+      .map((r,index) => {
         const Component = RegionComponents[r.type]
         return (
           <Component
-            key={r.regionId}
+            key={`${iw}_${ih}_${r.type}_${r.regionId}_${index}`}
             region={r}
             iw={iw}
             ih={ih}
@@ -222,6 +222,7 @@ export const RegionShapes = ({
   if (isNaN(iw) || isNaN(ih)) return null
   return (
     <svg
+      key={`${iw}-${ih}`}
       width={iw}
       height={ih}
       style={{
@@ -235,7 +236,7 @@ export const RegionShapes = ({
       }}
     >
       <WrappedRegionList
-        key="wrapped-region-list"
+        key={`wrapped-region-lis-${iw}-${ih}`}
         regions={regions}
         iw={iw}
         ih={ih}
