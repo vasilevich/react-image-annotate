@@ -1,21 +1,20 @@
 // @flow
 
-import React, { useRef, useCallback } from "react"
-import type { Node } from "react"
-import { makeStyles, styled } from "@material-ui/core/styles"
+import type {Node} from "react"
+import React, {useCallback, useRef} from "react"
+import {makeStyles, styled} from "@material-ui/core/styles"
 import ImageCanvas from "../ImageCanvas"
 import styles from "./styles"
-import type { MainLayoutState, Action } from "./types"
+import type {Action, MainLayoutState} from "./types"
 import useKey from "use-key-hook"
 import classnames from "classnames"
-import { useSettings } from "../SettingsProvider"
+import {useSettings} from "../SettingsProvider"
 import SettingsDialog from "../SettingsDialog"
-// import Fullscreen from "../Fullscreen"
-import { FullScreen, useFullScreenHandle } from "react-full-screen"
+import {FullScreen, useFullScreenHandle} from "react-full-screen"
 import getActiveImage from "../Annotator/reducers/get-active-image"
 import useImpliedVideoRegions from "./use-implied-video-regions"
-import { useDispatchHotkeyHandlers } from "../ShortcutsManager"
-import { withHotKeys } from "react-hotkeys"
+import {useDispatchHotkeyHandlers} from "../ShortcutsManager"
+import {withHotKeys} from "react-hotkeys"
 import iconDictionary from "./icon-dictionary"
 import KeyframeTimeline from "../KeyframeTimeline"
 import Workspace from "../Workspace/Workspace"
@@ -24,16 +23,16 @@ import TagsSidebarBox from "../TagsSidebarBox"
 import KeyframesSelector from "../KeyframesSelectorSidebarBox"
 import TaskDescription from "../TaskDescriptionSidebarBox"
 import RegionSelector from "../RegionSelectorSidebarBox"
-import ImageSelector from "../ImageSelectorSidebarBox"
-import HistorySidebarBox from "../HistorySidebarBox"
+import ChangesInSessionBox from "../ChangesInSessionBox"
+import HistoryBox from "../HistoryBox"
 import useEventCallback from "use-event-callback"
 import getHotkeyHelpText from "../utils/get-hotkey-help-text"
 
 const emptyArr = []
 const useStyles = makeStyles(styles)
 
-const HotkeyDiv = withHotKeys(({ hotKeys, children, divRef, ...props }) => (
-  <div {...{ ...hotKeys, ...props }} ref={divRef}>
+const HotkeyDiv = withHotKeys(({hotKeys, children, divRef, ...props}) => (
+  <div {...{...hotKeys, ...props}} ref={divRef}>
     {children}
   </div>
 ))
@@ -57,42 +56,45 @@ type Props = {
   hideHeader?: boolean,
   hideHeaderText?: boolean,
   //from tinus
-  hideRightSidebarSections:{
-    'tasks':boolean,
-    history:boolean
+  hideRightSidebarSections: {
+    'tasks': boolean,
+    history: boolean
   },
-  rightSidebarInjectedSections:[],
-  rightSidebarInjectedSectionsBottom:[],
-  controlId?:string,
-  rightSidebarOnLeft:boolean,
-  topBarOpts:{},
-  readOnly:Boolean,
+  rightSidebarInjectedSections: [],
+  rightSidebarInjectedSectionsBottom: [],
+  controlId?: string,
+  rightSidebarOnLeft: boolean,
+  topBarOpts: {},
+  readOnly: Boolean,
+  buttonsWithDispatch: any[],
 }
 
 export const MainLayout = ({
-  state,
-  dispatch,
-  alwaysShowNextButton = false,
-  alwaysShowPrevButton = false,
-  RegionEditLabel,
-  onRegionClassAdded,
-  hideHeader,
-  hideHeaderText,
-  headerAddedItems,
-  readOnly,
-  rightSidebarOnLeft,
-  hideRightSidebarSections={
-    'tasks':true,
-    history:false
-  },
-  rightSidebarInjectedSections=[],
-  rightSidebarInjectedSectionsBottom=[],
-  topBarOpts,
-  headerSubSection,
-  controlId,
-  hideNext = false,
-  hidePrev = false,
-}: Props) => {
+                             state,
+                             dispatch,
+                             alwaysShowNextButton = false,
+                             alwaysShowPrevButton = false,
+                             RegionEditLabel,
+                             onRegionClassAdded,
+                             hideHeader,
+                             hideHeaderText,
+                             headerAddedItems,
+                             readOnly,
+                             rightSidebarOnLeft,
+                             hideRightSidebarSections = {
+                               'tasks': true,
+                               history: false
+                             },
+                             rightSidebarInjectedSections = [],
+                             rightSidebarInjectedSectionsBottom = [],
+                             topBarOpts,
+                             headerSubSection,
+                             controlId,
+                             hideNext = false,
+                             hidePrev = false,
+                             hideSave = false,
+                             buttonsWithDispatch = (dispatch) => null,
+                           }: Props) => {
   const classes = useStyles()
   const settings = useSettings()
   const fullScreenHandle = useFullScreenHandle()
@@ -106,36 +108,34 @@ export const MainLayout = ({
     const fn = (...args: any) =>
       params.length > 0
         ? dispatch(
-            ({
-              type,
-              ...params.reduce((acc, p, i) => ((acc[p] = args[i]), acc), {}),
-            }: any)
-          )
-        : dispatch({ type, ...args[0]})
+          ({
+            type,
+            ...params.reduce((acc, p, i) => ((acc[p] = args[i]), acc), {}),
+          }: any)
+        ) : dispatch({type, ...args[0]})
     memoizedActionFns.current[fnKey] = fn
     return fn
   }
 
-  const { currentImageIndex, activeImage } = getActiveImage(state)
+  const {currentImageIndex, activeImage} = getActiveImage(state)
   let nextImage
   if (currentImageIndex !== null) {
     nextImage = state.images[currentImageIndex + 1]
   }
 
-  useKey(() => dispatch({ type: "CANCEL" }), {
+  useKey(() => dispatch({type: "CANCEL"}), {
     detectKeys: [27],
   })
 
   const isAVideoFrame = activeImage && activeImage.frameTime !== undefined
   const innerContainerRef = useRef()
-  const hotkeyHandlers = useDispatchHotkeyHandlers({ dispatch })
+  const hotkeyHandlers = useDispatchHotkeyHandlers({dispatch})
 
   let impliedVideoRegions = useImpliedVideoRegions(state)
 
-  if(state.readOnly!==readOnly)
-  {
-    console.debug(`InvokingActionForReadOnly!!`,state.readOnly,readOnly)
-    dispatch({ type: "READONLY", val:readOnly })
+  if (state.readOnly !== readOnly) {
+    console.debug(`InvokingActionForReadOnly!!`, state.readOnly, readOnly)
+    dispatch({type: "READONLY", val: readOnly})
   }
   // if(state.readOnly)
   // {
@@ -224,16 +224,17 @@ export const MainLayout = ({
   )
 
   const onClickIconSidebarItem = useEventCallback((item) => {
-    dispatch({ type: "SELECT_TOOL", selectedTool: item.name })
+    dispatch({type: "SELECT_TOOL", selectedTool: item.name})
   })
 
   const onClickHeaderItem = useEventCallback((item) => {
     if (item.name === "Fullscreen") {
       fullScreenHandle.enter()
-    } else if (item.name === "Window") {
+    }
+    else if (item.name === "Window") {
       fullScreenHandle.exit()
     }
-    dispatch({ type: "HEADER_BUTTON_CLICKED", buttonName: item.name })
+    dispatch({type: "HEADER_BUTTON_CLICKED", buttonName: item.name})
   })
 
   const debugModeOn = Boolean(window.localStorage.$ANNOTATE_DEBUG_MODE && state)
@@ -282,19 +283,19 @@ export const MainLayout = ({
               ) : null,
             ].filter(Boolean)}
             headerSubSection={headerSubSection}
-            headerAddedItems={headerAddedItems}
+            headerAddedItems={<>{headerAddedItems} {buttonsWithDispatch(dispatch)}</>}
             headerItems={[
-              !nextImageHasRegions && !(topBarOpts && topBarOpts.hide && topBarOpts.hide.clone) && !readOnly && activeImage.regions && { name: "Clone" },
-              !hidePrev && { name: "Prev" },
-              !hideNext && { name: "Next" },
+              !nextImageHasRegions && !(topBarOpts && topBarOpts.hide && topBarOpts.hide.clone) && !readOnly && activeImage.regions && {name: "Clone"},
+              !hidePrev && {name: "Prev"},
+              !hideNext && {name: "Next"},
               state.annotationType !== "video"
                 ? null
                 : !state.videoPlaying
-                ? { name: "Play" }
-                : { name: "Pause" },
-            //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && { name: "Settings" },
-            //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) &&  (state.fullScreen ? { name: "Window" } : { name: "Fullscreen" }),
-              !(topBarOpts && topBarOpts.hide && topBarOpts.hide.save) && { name: "Save" },
+                  ? {name: "Play"}
+                  : {name: "Pause"},
+              //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.settings) && { name: "Settings" },
+              //  !(topBarOpts && topBarOpts.hide && topBarOpts.hide.fullscreen) &&  (state.fullScreen ? { name: "Window" } : { name: "Fullscreen" }),
+              !hideSave && !(topBarOpts && topBarOpts.hide && topBarOpts.hide.save) && {name: "Save"},
             ].filter(Boolean)}
             onClickHeaderItem={onClickHeaderItem}
             onClickIconSidebarItem={onClickIconSidebarItem}
@@ -364,11 +365,12 @@ export const MainLayout = ({
               )}
             rightSidebarItems={[
               debugModeOn && (
-                <DebugBox key={'bgh'} state={debugModeOn} lastAction={state.lastAction} /> || <React.Fragment key="bjdd"></React.Fragment>
+                <DebugBox key={'bgh'} state={debugModeOn} lastAction={state.lastAction}/> ||
+                <React.Fragment key="bjdd"></React.Fragment>
               ),
               ...rightSidebarInjectedSections || [],
               state.taskDescription && !hideRightSidebarSections.tasks && (
-                <TaskDescription key={10} description={state.taskDescription} />
+                <TaskDescription key={10} description={state.taskDescription}/>
               ),
               state.labelImages && (
                 <TagsSidebarBox
@@ -380,12 +382,7 @@ export const MainLayout = ({
                   expandedByDefault
                 />
               ),
-              // (state.images?.length || 0) > 1 && (
-              //   <ImageSelector
-              //     onSelect={action("SELECT_REGION", "region")}
-              //     images={state.images}
-              //   />
-              // ),
+
               <RegionSelector
                 key={4}
                 regions={activeImage ? activeImage.regions : emptyArr}
@@ -405,10 +402,14 @@ export const MainLayout = ({
                   keyframes={state.keyframes}
                 />
               ),
-            !hideRightSidebarSections.history &&   <HistorySidebarBox
+              !hideRightSidebarSections.history && <ChangesInSessionBox
                 key={6}
                 history={state.history}
                 onRestoreHistory={action("RESTORE_HISTORY")}
+              />,
+              <HistoryBox
+                key={7}
+                history={activeImage.history}
               />,
               ...rightSidebarInjectedSectionsBottom || []
             ].filter(Boolean)}

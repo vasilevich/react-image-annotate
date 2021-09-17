@@ -20,19 +20,19 @@ export type Point = {|
 
 export type PixelRegion =
   | {|
-      ...$Exact<BaseRegion>,
-      type: "pixel",
-      sx: number,
-      sy: number,
-      w: number,
-      h: number,
-      src: string,
-    |}
+  ...$Exact<BaseRegion>,
+  type: "pixel",
+  sx: number,
+  sy: number,
+  w: number,
+  h: number,
+  src: string,
+|}
   | {|
-      ...$Exact<BaseRegion>,
-      type: "pixel",
-      points: Array<[number, number]>,
-    |}
+  ...$Exact<BaseRegion>,
+  type: "pixel",
+  points: Array<[number, number]>,
+|}
 export type Box = {|
   ...$Exact<BaseRegion>,
   type: "box",
@@ -103,30 +103,29 @@ export const getEnclosingBox = (region: Region) => {
     }
     case "geometry": {
       const box = {
-        x: region.coordinates &&  region.coordinates[0] && Math.min(...region.coordinates[0].map(([x, y]) => x)) || 0,
-        y: region.coordinates &&  region.coordinates[0] && Math.min(...region.coordinates[0].map(([x, y]) => y)) || 0,
+        x: region.coordinates && region.coordinates[0] && Math.min(...region.coordinates[0].map(([x, y]) => x)) || 0,
+        y: region.coordinates && region.coordinates[0] && Math.min(...region.coordinates[0].map(([x, y]) => y)) || 0,
         w: 0,
         h: 0,
       }
-      if(region.coordinates &&  region.coordinates[0])
-      {
+      if (region.coordinates && region.coordinates[0]) {
         box.w = Math.max(...region.coordinates[0].map(([x, y]) => x)) - box.x
         box.h = Math.max(...region.coordinates[0].map(([x, y]) => y)) - box.y
-      }    
+      }
       return box
     }
     case "keypoints": {
       const minX = Math.min(
-        ...Object.values(region.points).map(({ x, y }) => x)
+        ...Object.values(region.points).map(({x, y}) => x)
       )
       const minY = Math.min(
-        ...Object.values(region.points).map(({ x, y }) => y)
+        ...Object.values(region.points).map(({x, y}) => y)
       )
       const maxX = Math.max(
-        ...Object.values(region.points).map(({ x, y }) => x)
+        ...Object.values(region.points).map(({x, y}) => x)
       )
       const maxY = Math.max(
-        ...Object.values(region.points).map(({ x, y }) => y)
+        ...Object.values(region.points).map(({x, y}) => y)
       )
       return {
         x: minX,
@@ -137,69 +136,61 @@ export const getEnclosingBox = (region: Region) => {
     }
     case "expanding-line": {
       const box = {
-        x: Math.min(...region.points.map(({ x, y }) => x)),
-        y: Math.min(...region.points.map(({ x, y }) => y)),
+        x: Math.min(...region.points.map(({x, y}) => x)),
+        y: Math.min(...region.points.map(({x, y}) => y)),
         w: 0,
         h: 0,
       }
-      box.w = Math.max(...region.points.map(({ x, y }) => x)) - box.x
-      box.h = Math.max(...region.points.map(({ x, y }) => y)) - box.y
+      box.w = Math.max(...region.points.map(({x, y}) => x)) - box.x
+      box.h = Math.max(...region.points.map(({x, y}) => y)) - box.y
       return box
     }
     case "box": {
-      return { x: region.x, y: region.y, w: region.w, h: region.h }
+      return {x: region.x, y: region.y, w: region.w, h: region.h}
     }
     case "point": {
-      return { x: region.x, y: region.y, w: 0, h: 0 }
+      return {x: region.x, y: region.y, w: 0, h: 0}
     }
     default: {
-      return { x: 0, y: 0, w: 0, h: 0 }
+      return {x: 0, y: 0, w: 0, h: 0}
     }
   }
   throw new Error("unknown region")
 }
 
 export const moveRegion = (region: Region, x: number, y: number) => {
-  if(x<0)
-  {
-    x=0
+  if (x < 0) {
+    x = 0
   }
-  if(x>1)
-  {
-    x=1
+  if (x > 1) {
+    x = 1
   }
-  if(y<0)
-  {
-    y=0
+  if (y < 0) {
+    y = 0
   }
-  if(y>1)
-  {
-    y=1
+  if (y > 1) {
+    y = 1
   }
-  const halfw=region.w/2
-  if(x - halfw < 0)
-  {
+  const halfw = region.w / 2
+  if (x - halfw < 0) {
     x = halfw
   }
-  if(x+halfw>1)
-  {
-    x=1-halfw
+  if (x + halfw > 1) {
+    x = 1 - halfw
   }
-  const halfh=region.h/2
-  if(y - halfh < 0)
-  {
+  const halfh = region.h / 2
+  if (y - halfh < 0) {
     y = halfh
   }
-  if(y+halfh>1)
-  {
-    y=1-halfh
+  if (y + halfh > 1) {
+    y = 1 - halfh
   }
   switch (region.type) {
     case "point": {
-      return { ...region, x, y }
+      return {...region, x, y}
     }
     case "box": {
-      return { ...region, x: x - region.w / 2, y: y - region.h / 2 }
+      return {...region, x: x - region.w / 2, y: y - region.h / 2}
     }
   }
   return region

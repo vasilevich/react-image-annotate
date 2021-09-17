@@ -1,9 +1,15 @@
-import React, { useReducer, useEffect, useMemo } from "react"
-import { styled } from "@material-ui/core/styles"
+import React, {useEffect, useMemo, useReducer} from "react"
+import {styled} from "@material-ui/core/styles"
 import ButtonBase from "@material-ui/core/ButtonBase"
 import ExpandIcon from "@material-ui/icons/KeyboardArrowLeft"
 import ContractIcon from "@material-ui/icons/KeyboardArrowRight"
-import { grey } from "@material-ui/core/colors"
+import {grey} from "@material-ui/core/colors"
+
+/**
+ * rightSide width
+ * @type {number}
+ */
+const width = 350;
 
 const Container = styled("div")({
   width: 0,
@@ -14,7 +20,7 @@ const Container = styled("div")({
   position: "relative",
   transition: "width 500ms",
   "&.expanded": {
-    width: 300,
+    width: width,
   },
 })
 
@@ -59,11 +65,11 @@ const Slider = styled("div")({
   overflow: "hidden",
   transition: "opacity 500ms, left 500ms, width 500ms",
   "&.expanded": {
-    width: 300,
+    width: width,
   },
 })
 const InnerSliderContent = styled("div")({
-  width: 300,
+  width: width,
   position: "absolute",
   right: 0,
   top: 0,
@@ -78,7 +84,7 @@ const getInitialExpandedState = () => {
   }
 }
 
-export const RightSidebar = ({ children, initiallyExpanded, height,rightSidebarOnLeft }) => {
+export const RightSidebar = ({children, initiallyExpanded, height, rightSidebarOnLeft}) => {
   const [expanded, toggleExpanded] = useReducer(
     (state) => !state,
     initiallyExpanded === undefined
@@ -94,18 +100,19 @@ export const RightSidebar = ({ children, initiallyExpanded, height,rightSidebarO
     }
   }, [initiallyExpanded, expanded])
 
-  const containerStyle = useMemo(() => ({ height: height || "100%" }), [height])
+  const containerStyle = useMemo(() => ({height: height || "100%"}), [height])
 
   return (
     <Container className={expanded ? "expanded" : ""} style={containerStyle}>
-      <Slider style={{overflowY:'auto'}} className={`sliderdiv ${expanded ? "expanded" : ""}`}>
+      <Slider style={{overflowY: 'auto'}} className={`sliderdiv ${expanded ? "expanded" : ""}`}>
         <InnerSliderContent>{children}</InnerSliderContent>
       </Slider>
-      <Expander  onClick={toggleExpanded} className={expanded ? "expanded" : ""} style={rightSidebarOnLeft && {left:'auto',right:0} || {}}>
+      <Expander onClick={toggleExpanded} className={expanded ? "expanded" : ""}
+                style={rightSidebarOnLeft && {left: 'auto', right: 0} || {}}>
         {(expanded && !rightSidebarOnLeft) || (rightSidebarOnLeft && !expanded) ? (
-          <ContractIcon className="icon" />
+          <ContractIcon className="icon"/>
         ) : (
-          <ExpandIcon className="icon" />
+          <ExpandIcon className="icon"/>
         )}
       </Expander>
     </Container>

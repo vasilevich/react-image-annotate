@@ -1,16 +1,10 @@
 // @flow
 
-import React, { useReducer, useEffect } from "react"
-import type { Node } from "react"
+import type {Node} from "react"
+import React, {useEffect, useReducer} from "react"
 import MainLayout from "../MainLayout"
-import type {
-  ToolEnum,
-  Image,
-  Mode,
-  MainLayoutState,
-  Action,
-} from "../MainLayout/types"
-import type { KeypointsDefinition } from "../ImageCanvas/region-tools"
+import type {Action, Image, MainLayoutState,} from "../MainLayout/types"
+import type {KeypointsDefinition} from "../ImageCanvas/region-tools"
 import SettingsProvider from "../SettingsProvider"
 
 import combineReducers from "./reducers/combine-reducers.js"
@@ -20,18 +14,16 @@ import videoReducer from "./reducers/video-reducer.js"
 import historyHandler from "./reducers/history-handler.js"
 
 import useEventCallback from "use-event-callback"
-import makeImmutable, { without } from "seamless-immutable"
+import makeImmutable, {without} from "seamless-immutable"
 import getFromLocalStorage from "../utils/get-from-local-storage"
-import { AnnotatorModule } from './moduleDispatcher'
-import {indexOf} from "lodash";
-
+import {AnnotatorModule} from './moduleDispatcher'
 
 
 type Props = {
   taskDescription?: string,
   allowedArea?: { x: number, y: number, w: number, h: number },
   regionTagList?: Array<string>,
-  regionClsList?: Array<string> | Array<{name:string,color:string}>,
+  regionClsList?: Array<string> | Array<{ name: string, color: string }>,
   imageTagList?: Array<string>,
   imageClsList?: Array<string>,
   enabledTools?: Array<string>,
@@ -56,65 +48,69 @@ type Props = {
   hideHeaderText?: boolean,
   hideNext?: boolean,
   hidePrev?: boolean,
+  hideSave?: boolean,
+  buttonsWithDispatch?: any,
 }
 
 export const Annotator = ({
-  images,
-  allowedArea,
-  selectedImage = images && images.length > 0 ? 0 : undefined,
-  showPointDistances,
-  pointDistancePrecision,
-  showTags = getFromLocalStorage("showTags", true),
-  enabledTools = [
-    "select",
-    "create-point",
-    "create-box",
-    "create-polygon",
-    "create-expanding-line",
-    "show-mask",
-  ],
-  hideRightSidebarSections={},
-  rightSidebarOnLeft=false,
-  rightSidebarInjectedSections=[],
-  rightSidebarInjectedSectionsBottom=[],
-  controlId='',
-  selectedTool = "select",
-  regionTagList = [],
-  regionClsList = [],
-  imageTagList = [],
-  imageClsList = [],
-  keyframes = {},
-  taskDescription = "",
-  fullImageSegmentationMode = false,
-  RegionEditLabel,
-  topBarOpts,
-  readOnly,
-  headerAddedItems,
-  headerSubSection,
-  videoSrc,
-  videoTime = 0,
-  videoName,
-  onExit,
-  onNextImage,
-  onPrevImage,
-  keypointDefinitions,
-  autoSegmentationOptions = { type: "autoseg" },
-  hideHeader,
-  hideHeaderText,
-  hideNext,
-  hidePrev,
-}: Props) => {
+                            images,
+                            allowedArea,
+                            selectedImage = images && images.length > 0 ? 0 : undefined,
+                            showPointDistances,
+                            pointDistancePrecision,
+                            showTags = getFromLocalStorage("showTags", true),
+                            enabledTools = [
+                              "select",
+                              "create-point",
+                              "create-box",
+                              "create-polygon",
+                              "create-expanding-line",
+                              "show-mask",
+                            ],
+                            hideRightSidebarSections = {},
+                            rightSidebarOnLeft = false,
+                            rightSidebarInjectedSections = [],
+                            rightSidebarInjectedSectionsBottom = [],
+                            controlId = '',
+                            selectedTool = "select",
+                            regionTagList = [],
+                            regionClsList = [],
+                            imageTagList = [],
+                            imageClsList = [],
+                            keyframes = {},
+                            taskDescription = "",
+                            fullImageSegmentationMode = false,
+                            RegionEditLabel,
+                            topBarOpts,
+                            readOnly,
+                            headerAddedItems,
+                            headerSubSection,
+                            videoSrc,
+                            videoTime = 0,
+                            videoName,
+                            onExit,
+                            onNextImage,
+                            onPrevImage,
+                            keypointDefinitions,
+                            autoSegmentationOptions = {type: "autoseg"},
+                            hideHeader,
+                            hideHeaderText,
+                            hideNext,
+                            hidePrev,
+                            hideSave,
+                            buttonsWithDispatch,
+                          }: Props) => {
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
     if (selectedImage === -1) selectedImage = undefined
   }
   const colors = [];
-  for(const clsIndex in regionClsList){
+  for (const clsIndex in regionClsList) {
     const cls = regionClsList[clsIndex];
-    if(typeof cls !=='string'){
+    if (typeof cls !== 'string') {
       let color = cls.color;
-      while(color.startsWith("#")){
-        color=color.slice(1);
+      while (color.startsWith("#")) {
+        color = color.slice(1);
       }
       colors.push(`#${color}`);
       regionClsList[clsIndex] = cls.name;
@@ -163,15 +159,15 @@ export const Annotator = ({
       keypointDefinitions,
       ...(annotationType === "image"
         ? {
-            selectedImage,
-            images,
-            selectedImageFrameTime:
-              images && images.length > 0 ? images[0].frameTime : undefined,
-          }
+          selectedImage,
+          images,
+          selectedImageFrameTime:
+            images && images.length > 0 ? images[0].frameTime : undefined,
+        }
         : {
-            videoSrc,
-            keyframes,
-          }),
+          videoSrc,
+          keyframes,
+        }),
     })
   )
 
@@ -179,9 +175,11 @@ export const Annotator = ({
     if (action.type === "HEADER_BUTTON_CLICKED") {
       if (["Exit", "Done", "Save", "Complete"].includes(action.buttonName)) {
         return onExit(without(state, "history"))
-      } else if (action.buttonName === "Next" && onNextImage) {
+      }
+      else if (action.buttonName === "Next" && onNextImage) {
         return onNextImage(without(state, "history"))
-      } else if (action.buttonName === "Prev" && onPrevImage) {
+      }
+      else if (action.buttonName === "Prev" && onPrevImage) {
         return onPrevImage(without(state, "history"))
       }
     }
@@ -189,7 +187,7 @@ export const Annotator = ({
   })
 
 
-  AnnotatorModule.dispatch=dispatch;
+  AnnotatorModule.dispatch = dispatch;
 
   const onRegionClassAdded = useEventCallback((cls) => {
     dispatchToReducer({
@@ -232,6 +230,8 @@ export const Annotator = ({
         hideHeaderText={hideHeaderText}
         hideNext={hideNext}
         hidePrev={hidePrev}
+        hideSave={hideSave}
+        buttonsWithDispatch={buttonsWithDispatch}
       />
     </SettingsProvider>
   )

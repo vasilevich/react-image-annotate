@@ -69,7 +69,7 @@ export const TagsSidebarBox = ({
           />
         </div>
       )}
-      {false && imageTagList.length > 0 && (
+      {imageTagList.length > 0 && (
         <div style={{padding: 8, paddingTop: 0}}>
           <Select
             isMulti

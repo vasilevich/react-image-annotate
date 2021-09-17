@@ -61,7 +61,7 @@ export const RegionLabel = ({
                 className="circle"
                 style={{backgroundColor: region.color}}
               />
-              {region.cls}
+              {`(${region.id})`} {region.cls}
             </div>
           )}
           {region.tags && (
@@ -127,7 +127,7 @@ export const RegionLabel = ({
               </div>}
             </div>
           )}
-          {false && (allowedTags || []).length > 0 && (
+          {(allowedTags || []).length > 0 && (
             <div style={{marginTop: 4}}>
               {!ro && <Select
                 onChange={(newTags) =>

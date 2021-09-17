@@ -26,7 +26,7 @@ const useStyles = makeStyles({
 
 const listItemTextStyle = { paddingLeft: 16 }
 
-export const HistorySidebarBox = ({
+export const ChangesInSessionBox = ({
   history,
   onRestoreHistory,
 }: {
@@ -65,7 +65,7 @@ export const HistorySidebarBox = ({
   )
 }
 
-export default memo(HistorySidebarBox, (prevProps, nextProps) =>
+export default memo(ChangesInSessionBox, (prevProps, nextProps) =>
   isEqual(
     prevProps.history.map((a) => [a.name, a.time]),
     nextProps.history.map((a) => [a.name, a.time])
