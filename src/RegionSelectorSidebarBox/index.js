@@ -1,13 +1,10 @@
 // @flow
 
-import React, { Fragment, useState, memo } from "react"
+import React, {memo, useState} from "react"
 import SidebarBoxContainer from "../SidebarBoxContainer"
-import { makeStyles, styled } from "@material-ui/core/styles"
-import { grey } from "@material-ui/core/colors"
+import {makeStyles, styled} from "@material-ui/core/styles"
 import RegionIcon from "@material-ui/icons/PictureInPicture"
 import Grid from "@material-ui/core/Grid"
-import ReorderIcon from "@material-ui/icons/SwapVert"
-import PieChartIcon from "@material-ui/icons/PieChart"
 import TrashIcon from "@material-ui/icons/Delete"
 import LockIcon from "@material-ui/icons/Lock"
 import UnlockIcon from "@material-ui/icons/LockOpen"
@@ -25,30 +22,30 @@ const HeaderSep = styled("div")({
   marginBottom: 2,
 })
 
-const Chip = ({ color, text }) => {
+const Chip = ({color, text}) => {
   const classes = useStyles()
   return (
     <span className={classes.chip}>
-      <div className="color" style={{ backgroundColor: color }} />
+      <div className="color" style={{backgroundColor: color}}/>
       <div className="text">{text}</div>
     </span>
   )
 }
 
 const RowLayout = ({
-  region,
-  header,
-  highlighted,
-  order,
-  classification,
-  area,
-  tags,
-  trash,
-  lock,
-  visible,
-  onClick,
-  state,
-}) => {
+                     region,
+                     header,
+                     highlighted,
+                     order,
+                     classification,
+                     area,
+                     tags,
+                     trash,
+                     lock,
+                     visible,
+                     onClick,
+                     state,
+                   }) => {
   const classes = useStyles()
   const [mouseOver, changeMouseOver] = useState(false)
   const ro = state.readOnly
@@ -57,18 +54,18 @@ const RowLayout = ({
       onClick={onClick}
       onMouseEnter={() => changeMouseOver(true)}
       onMouseLeave={() => changeMouseOver(false)}
-      className={classnames(classes.row, { header, highlighted })}
-      style={ro && { padding:'15pt 5pt 15pt 0pt'} || {}}
+      className={classnames(classes.row, {header, highlighted})}
+      style={ro && {padding: '15pt 5pt 15pt 0pt'} || {}}
     >
       <Grid container alignItems="center">
         <Grid item xs={2}>
-          <div style={{ textAlign: "right", paddingRight: 10 }}>{order}</div>
+          <div style={{textAlign: "right", paddingRight: 10}}>{order}</div>
         </Grid>
         <Grid item xs={5}>
-           {classification}
+          {classification}
         </Grid>
         <Grid item xs={2}>
-          <div style={{ textAlign: "right", paddingRight: 6 }}>{area}</div>
+          <div style={{textAlign: "right", paddingRight: 6}}>{area}</div>
         </Grid>
         <Grid item xs={1}>
           {!ro && trash}
@@ -85,27 +82,27 @@ const RowLayout = ({
 }
 
 const RowHeader = ({
-  regions = emptyArr,
-  onDeleteRegion,
-  onChangeRegion,
-  onSelectRegion,
-  state,
-}) => {
-  const vis=React.useState(true)
+                     regions = emptyArr,
+                     onDeleteRegion,
+                     onChangeRegion,
+                     onSelectRegion,
+                     state,
+                   }) => {
+  const vis = React.useState(true)
   return (
     <RowLayout
-    header
-    state={state}
-    highlighted={false}
-    visible={<VisibleIcon className="icon" onClick={()=>{
-      regions.forEach(r=>{
-        onChangeRegion({ ...r, visible: !vis[0] })
+      header
+      state={state}
+      highlighted={false}
+      visible={<VisibleIcon className="icon" onClick={() => {
+        regions.forEach(r => {
+          onChangeRegion({...r, visible: !vis[0]})
 
-      })
-      vis[1](!vis[0])
-    }} />}
-    classification={<div style={{ paddingLeft: 10 }}>Class</div>}
-  />
+        })
+        vis[1](!vis[0])
+      }}/>}
+      classification={<div style={{paddingLeft: 10}}>Class</div>}
+    />
     // <RowLayout
     //   header
     //   highlighted={false}
@@ -122,18 +119,18 @@ const RowHeader = ({
 const MemoRowHeader = memo(RowHeader)
 
 const Row = ({
-  region: r,
-  highlighted,
-  onSelectRegion,
-  onDeleteRegion,
-  onChangeRegion,
-  visible,
-  locked,
-  color,
-  cls,
-  index,
-  state,
-}) => {
+               region: r,
+               highlighted,
+               onSelectRegion,
+               onDeleteRegion,
+               onChangeRegion,
+               visible,
+               locked,
+               color,
+               cls,
+               index,
+               state,
+             }) => {
   return (
     <RowLayout
       header={false}
@@ -141,33 +138,37 @@ const Row = ({
       state={state}
       highlighted={highlighted}
       onClick={(e) => {
-        console.debug(`clickedRegionSelector`,r)
-        onSelectRegion(r)
+        let visible = r.visible;
+        if (visible === undefined) {
+          visible = true;
+        }
+        onChangeRegion({...r, visible: !visible});
       }}
       order={`#${index + 1}`}
-      classification={<div style={r && r.group && {paddingLeft:'16pt'} || {}}><Chip  text={cls || ""} color={color || "#ddd"} /></div> }
+      classification={<div style={r && r.group && {paddingLeft: '16pt'} || {}}><Chip text={cls || ""}
+                                                                                     color={color || "#ddd"}/></div>}
       area=""
-      trash={<TrashIcon onClick={() => onDeleteRegion(r)} className="icon2" />}
+      trash={<TrashIcon onClick={() => onDeleteRegion(r)} className="icon2"/>}
       lock={
         r.locked ? (
           <LockIcon
-            onClick={() => onChangeRegion({ ...r, locked: false })}
+            onClick={() => onChangeRegion({...r, locked: false})}
             className="icon2"
           />
         ) : (
           <UnlockIcon
-            onClick={() => onChangeRegion({ ...r, locked: true })}
+            onClick={() => onChangeRegion({...r, locked: true})}
             className="icon2"
           />
         )
       }
       visible={
         r.visible || r.visible === undefined ? (
-           <VisibleIcon
+          <VisibleIcon
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              onChangeRegion({ ...r, visible: false,highlighted:false })
+              onChangeRegion({...r, visible: false, highlighted: false})
             }}
             className="icon2"
           />
@@ -176,7 +177,7 @@ const Row = ({
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              onChangeRegion({ ...r, visible: true })
+              onChangeRegion({...r, visible: true})
             }}
             className="icon2"
           />
@@ -201,12 +202,12 @@ const MemoRow = memo(
 const emptyArr = []
 
 export const RegionSelectorSidebarBox = ({
-  regions = emptyArr,
-  onDeleteRegion,
-  onChangeRegion,
-  onSelectRegion,
-  state
-}) => {
+                                           regions = emptyArr,
+                                           onDeleteRegion,
+                                           onChangeRegion,
+                                           onSelectRegion,
+                                           state
+                                         }) => {
   const classes = useStyles()
   return (
     <SidebarBoxContainer
@@ -217,12 +218,14 @@ export const RegionSelectorSidebarBox = ({
       expandedByDefault
     >
       <div className={classes.container}>
-        <MemoRowHeader {...{regions,
-  onDeleteRegion,
-  onChangeRegion,
-  onSelectRegion,state}}
+        <MemoRowHeader {...{
+          regions,
+          onDeleteRegion,
+          onChangeRegion,
+          onSelectRegion, state
+        }}
         />
-        <HeaderSep  />
+        <HeaderSep/>
         {regions.map((r, i) => (
           <MemoRow
             key={r.id || i}
@@ -231,9 +234,8 @@ export const RegionSelectorSidebarBox = ({
             state={state}
             index={i}
             onSelectRegion={onSelectRegion}
-            onDeleteRegion={(...args)=>{
-              if(window.confirm('DELETE'))
-              {
+            onDeleteRegion={(...args) => {
+              if (window.confirm('DELETE')) {
                 onDeleteRegion(...args)
               }
             }}

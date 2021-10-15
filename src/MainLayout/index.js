@@ -67,6 +67,7 @@ type Props = {
   topBarOpts: {},
   readOnly: Boolean,
   buttonsWithDispatch: any[],
+  underCanvasComponent?:any,
 }
 
 export const MainLayout = ({
@@ -94,6 +95,7 @@ export const MainLayout = ({
                              hidePrev = false,
                              hideSave = false,
                              buttonsWithDispatch = (dispatch) => null,
+                             underCanvasComponent = null,
                            }: Props) => {
   const classes = useStyles()
   const settings = useSettings()
@@ -323,11 +325,11 @@ export const MainLayout = ({
                   "Zoom In/Out (scroll)" + getHotkeyHelpText("zoom_tool"),
                 alwaysShowing: true,
               },
-              !state.readOnly && {
-                name: "show-tags",
-                helperText: "Show / Hide Tags",
-                alwaysShowing: true,
-              },
+         //     !state.readOnly && {
+         //       name: "show-tags",
+         //       helperText: "Show / Hide Tags",
+         //       alwaysShowing: true,
+         //     },
               {
                 name: "create-point",
                 helperText: "Add Point" + getHotkeyHelpText("create_point"),
@@ -415,6 +417,7 @@ export const MainLayout = ({
             ].filter(Boolean)}
           >
             {canvas}
+            {underCanvasComponent}
           </Workspace>
           <SettingsDialog
             open={state.settingsOpen}

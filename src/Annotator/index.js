@@ -3,7 +3,7 @@
 import type {Node} from "react"
 import React, {useEffect, useReducer} from "react"
 import MainLayout from "../MainLayout"
-import type {Action, Image, MainLayoutState,} from "../MainLayout/types"
+import type {Action, Image, MainLayoutImageAnnotationState, MainLayoutState,} from "../MainLayout/types"
 import type {KeypointsDefinition} from "../ImageCanvas/region-tools"
 import SettingsProvider from "../SettingsProvider"
 
@@ -15,7 +15,6 @@ import historyHandler from "./reducers/history-handler.js"
 
 import useEventCallback from "use-event-callback"
 import makeImmutable, {without} from "seamless-immutable"
-import getFromLocalStorage from "../utils/get-from-local-storage"
 import {AnnotatorModule} from './moduleDispatcher'
 
 
@@ -50,6 +49,8 @@ type Props = {
   hidePrev?: boolean,
   hideSave?: boolean,
   buttonsWithDispatch?: any,
+  customReducer?: any,
+  underCanvasComponent?: any,
 }
 
 export const Annotator = ({
@@ -58,7 +59,7 @@ export const Annotator = ({
                             selectedImage = images && images.length > 0 ? 0 : undefined,
                             showPointDistances,
                             pointDistancePrecision,
-                            showTags = getFromLocalStorage("showTags", true),
+                            showTags = true,
                             enabledTools = [
                               "select",
                               "create-point",
@@ -99,6 +100,8 @@ export const Annotator = ({
                             hidePrev,
                             hideSave,
                             buttonsWithDispatch,
+                            customReducer,
+                            underCanvasComponent,
                           }: Props) => {
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
@@ -117,12 +120,21 @@ export const Annotator = ({
     }
   }
 
-  const annotationType = images ? "image" : "video"
+  const annotationType = images ? "image" : "video";
+
+  const _customReducer = (state: MainLayoutImageAnnotationState, action: Action) => {
+    if (typeof customReducer === 'function') {
+      return customReducer(state, action);
+    }
+    return state;
+  };
+
   const [state, dispatchToReducer] = useReducer(
     historyHandler(
       combineReducers(
         annotationType === "image" ? imageReducer : videoReducer,
-        generalReducer
+        generalReducer,
+        _customReducer,
       )
     ),
     makeImmutable({
@@ -232,6 +244,7 @@ export const Annotator = ({
         hidePrev={hidePrev}
         hideSave={hideSave}
         buttonsWithDispatch={buttonsWithDispatch}
+        underCanvasComponent={underCanvasComponent}
       />
     </SettingsProvider>
   )

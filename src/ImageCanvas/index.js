@@ -518,7 +518,7 @@ export const ImageCanvas = ({
       <div  onClick={()=>{
         const ac=getActiveImage(state)
           console.debug('REACTSTATE',{img:ac && state.images[ac.currentImageIndex], activeImg:ac,state})
-        }} className={classes.zoomIndicator}>
+        }} className={`${classes.zoomIndicator} zoomIndicator`}>
         {((1 / mat.a) * 100).toFixed(0)}%
       </div>
     </div>

@@ -10,7 +10,6 @@ import fixTwisted from "./fix-twisted"
 import convertExpandingLineToPolygon from "./convert-expanding-line-to-polygon"
 import clamp from "clamp"
 import getLandmarksWithTransform from "../../utils/get-landmarks-with-transform"
-import setInLocalStorage from "../../utils/set-in-local-storage"
 
 const getRandomId = () => Math.random().toString().split(".")[1]
 
@@ -863,7 +862,6 @@ export default (state: MainLayoutState, action: Action, readonly) => {
     }
     case "SELECT_TOOL": {
       if (action.selectedTool === "show-tags") {
-        setInLocalStorage("showTags", !state.showTags)
         return setIn(state, ["showTags"], !state.showTags)
       }
       else if (action.selectedTool === "show-mask") {

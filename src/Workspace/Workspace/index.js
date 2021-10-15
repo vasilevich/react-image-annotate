@@ -75,7 +75,9 @@ export default ({
           </RightSidebar>}
           </>
           )}
-          <WorkContainer>{children}</WorkContainer>
+          <WorkContainer>
+            {children}
+          </WorkContainer>
           {(rightSidebarItems.length === 0 || rightSidebarOnLeft )? null : (
             <RightSidebar
               initiallyExpanded={rightSidebarExpanded}
