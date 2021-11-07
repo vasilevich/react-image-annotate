@@ -113,7 +113,7 @@ export const RegionLabel = ({
                   }
                   return onChange({
                     ...(region: any),
-                    cls: o.value,
+                    cls: o ? o.value : undefined,
                   })
                 }}
                 value={
@@ -122,6 +122,7 @@ export const RegionLabel = ({
                 options={asMutable(
                   allowedClasses.map((c) => ({value: c, label: c}))
                 )}
+                isClearable
               /> || <div>
                 {region.cls}
               </div>}
